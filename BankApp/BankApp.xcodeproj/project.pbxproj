@@ -7,13 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D92AB49306195E800AF8A89 /* HomeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D92AB46306195E800AF8A89 /* HomeCoordinator.swift */; };
+		2D92AB4A306195E800AF8A89 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D92AB47306195E800AF8A89 /* HomeView.swift */; };
+		2D92AB4B306195E800AF8A89 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D92AB48306195E800AF8A89 /* HomeViewModel.swift */; };
 		81C9DE7B525F3F58623D5E3F /* BankAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A443DFE7D22B11E92674D38E /* BankAppApp.swift */; };
 		C56B705E6334EBF931F478A5 /* Pods_BankApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8218B5F0D5FF30F548D127FB /* Pods_BankApp.framework */; };
 		D075E8D7C8A4E2C86234A430 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFF51F030BA1445A4EC01CFE /* AppCoordinator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		07FE9375D87AA994B9C18BA8 /* BankApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BankApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		07FE9375D87AA994B9C18BA8 /* BankApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BankApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2D92AB46306195E800AF8A89 /* HomeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeCoordinator.swift; sourceTree = "<group>"; };
+		2D92AB47306195E800AF8A89 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		2D92AB48306195E800AF8A89 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		6AF0CBF9B4593ABDCDD9DE01 /* Pods-BankApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BankApp.debug.xcconfig"; path = "Target Support Files/Pods-BankApp/Pods-BankApp.debug.xcconfig"; sourceTree = "<group>"; };
 		8218B5F0D5FF30F548D127FB /* Pods_BankApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BankApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A443DFE7D22B11E92674D38E /* BankAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BankAppApp.swift; sourceTree = "<group>"; };
@@ -57,7 +63,6 @@
 				6AF0CBF9B4593ABDCDD9DE01 /* Pods-BankApp.debug.xcconfig */,
 				E2815AF63A3A1F5D8B3FA4A3 /* Pods-BankApp.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -72,6 +77,9 @@
 		E39262B5B473A7FFEF517A7F /* BankApp */ = {
 			isa = PBXGroup;
 			children = (
+				2D92AB46306195E800AF8A89 /* HomeCoordinator.swift */,
+				2D92AB47306195E800AF8A89 /* HomeView.swift */,
+				2D92AB48306195E800AF8A89 /* HomeViewModel.swift */,
 				DFF51F030BA1445A4EC01CFE /* AppCoordinator.swift */,
 				A443DFE7D22B11E92674D38E /* BankAppApp.swift */,
 			);
@@ -107,8 +115,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 3DEB96D8CF0AF4A6ACC242CD /* Build configuration list for PBXProject "BankApp" */;
 			developmentRegion = en;
@@ -177,6 +183,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				D075E8D7C8A4E2C86234A430 /* AppCoordinator.swift in Sources */,
+				2D92AB49306195E800AF8A89 /* HomeCoordinator.swift in Sources */,
+				2D92AB4A306195E800AF8A89 /* HomeView.swift in Sources */,
+				2D92AB4B306195E800AF8A89 /* HomeViewModel.swift in Sources */,
 				81C9DE7B525F3F58623D5E3F /* BankAppApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

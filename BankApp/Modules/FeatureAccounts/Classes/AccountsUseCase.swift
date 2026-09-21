@@ -10,15 +10,22 @@ import Core
 
 public protocol AccountsUseCaseProtocol {
     func fetchAccounts() async throws -> [Account]
+    func fetchRecentTransactions(for account: Account, limit: Int) async throws -> [Transaction]
 }
 
 /// Busca as contas via Core.OBPAPIClient e mapeia o DTO da API para a
 /// Entity de domínio. O DTO nunca sai daqui — a ViewModel só vê `Account`.
+///
+/// O extrato (fetchRecentTransactions) delega ao Core.TransactionsService,
+/// compartilhado com FeatureCards — ver comentário em TransactionsService.swift
+/// sobre por que essa lógica vive no Core e não aqui.
 public final class AccountsUseCase: AccountsUseCaseProtocol {
     private let apiClient: OBPAPIClient
+    private let transactionsService: TransactionsServiceProtocol
 
-    public init(apiClient: OBPAPIClient = .shared) {
+    public init(apiClient: OBPAPIClient = .shared, transactionsService: TransactionsServiceProtocol = TransactionsService()) {
         self.apiClient = apiClient
+        self.transactionsService = transactionsService
     }
 
     public func fetchAccounts() async throws -> [Account] {
@@ -27,10 +34,14 @@ public final class AccountsUseCase: AccountsUseCaseProtocol {
             Account(
                 id: dto.id,
                 bankId: dto.bankId,
-                label: dto.label,
-                balance: Decimal(string: dto.balance.amount) ?? 0,
-                currency: dto.balance.currency
+                label: dto.label ?? "Conta sem nome",
+                accountType: dto.accountType,
+                iban: dto.accountRoutings.first(where: { $0.scheme == "IBAN" })?.address
             )
         }
+    }
+
+    public func fetchRecentTransactions(for account: Account, limit: Int) async throws -> [Transaction] {
+        try await transactionsService.fetchRecentTransactions(bankId: account.bankId, accountId: account.id, limit: limit)
     }
 }

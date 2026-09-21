@@ -2,12 +2,15 @@ PODS:
   - Core (0.1.0)
   - FeatureAccounts (0.1.0):
     - Core
+  - FeatureCards (0.1.0):
+    - Core
   - FeatureLogin (0.1.0):
     - Core
 
 DEPENDENCIES:
   - Core (from `Modules/Core`)
   - FeatureAccounts (from `Modules/FeatureAccounts`)
+  - FeatureCards (from `Modules/FeatureCards`)
   - FeatureLogin (from `Modules/FeatureLogin`)
 
 EXTERNAL SOURCES:
@@ -15,14 +18,17 @@ EXTERNAL SOURCES:
     :path: Modules/Core
   FeatureAccounts:
     :path: Modules/FeatureAccounts
+  FeatureCards:
+    :path: Modules/FeatureCards
   FeatureLogin:
     :path: Modules/FeatureLogin
 
 SPEC CHECKSUMS:
   Core: 1c686407d508bd8e57919cb861fde11d55442dff
   FeatureAccounts: 5beb9439f9009d427d295adc4b6425fdb37fd8db
+  FeatureCards: 57674d8382c8612bc9ab28037e75a9d028f6ec5b
   FeatureLogin: 07d9059856a8b1a333aa5e037997b2a418783676
 
-PODFILE CHECKSUM: e02edb52c6e1efbd277c7f05ebd92202f232f88e
+PODFILE CHECKSUM: 0cfc6979179e0e33b74c017d154e1dc75a44a4da
 
 COCOAPODS: 1.16.2

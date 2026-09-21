@@ -79,10 +79,11 @@ public final class OBPAPIClient {
 
     // MARK: - Requests genéricos
 
-    public func get<T: Decodable>(path: String) async throws -> T {
+    public func get<T: Decodable>(path: String, apiVersionOverride: String? = nil) async throws -> T {
         guard let token = directLoginToken else { throw OBPAPIError.unauthorized }
+        let version = apiVersionOverride ?? apiVersion
 
-        var request = URLRequest(url: baseURL.appendingPathComponent("/obp/\(apiVersion)\(path)"))
+        var request = URLRequest(url: baseURL.appendingPathComponent("/obp/\(version)\(path)"))
         request.httpMethod = "GET"
         request.setValue("DirectLogin token=\"\(token)\"", forHTTPHeaderField: "Authorization")
 

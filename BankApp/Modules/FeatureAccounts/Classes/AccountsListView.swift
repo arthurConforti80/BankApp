@@ -39,11 +39,22 @@ private struct AccountRow: View {
     let account: Account
 
     var body: some View {
-        HStack {
+        VStack(alignment: .leading, spacing: 4) {
             Text(account.label)
-            Spacer()
-            Text("\(account.balance) \(account.currency)")
-                .foregroundStyle(.secondary)
+                .font(.headline)
+            if let iban = account.iban {
+                Text(iban)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            if let balance = account.balance, let currency = account.currency {
+                Text("\(balance) \(currency)")
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Saldo indisponível")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
         }
     }
 }

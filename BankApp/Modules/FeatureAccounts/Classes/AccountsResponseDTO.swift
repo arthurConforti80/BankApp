@@ -7,30 +7,31 @@
 
 import Foundation
 
-/// Espelha (aproximadamente) o formato de resposta de
-/// GET /obp/v4.0.0/my/accounts da sandbox OBP. Ver API Explorer
-/// (https://apiexplorersandbox.openbankproject.com) para confirmar o
-/// schema exato antes de usar contra a sandbox real — isto é uma
-/// aproximação razoável para fins de demonstração da camada de mapeamento.
+/// Espelha o formato de resposta de GET /obp/v4.0.0/my/accounts da sandbox
+/// OBP, confirmado contra chamada real (não traz saldo — a listagem só
+/// retorna metadados da conta; saldo exige uma chamada por conta separada,
+/// ver comentário em AccountsUseCase.fetchAccounts()).
 struct AccountsResponseDTO: Decodable {
     let accounts: [AccountDTO]
 }
 
 struct AccountDTO: Decodable {
     let id: String
+    let label: String?
     let bankId: String
-    let label: String
-    let balance: BalanceDTO
+    let accountType: String
+    let accountRoutings: [AccountRoutingDTO]
 
     enum CodingKeys: String, CodingKey {
         case id
-        case bankId = "bank_id"
         case label
-        case balance
+        case bankId = "bank_id"
+        case accountType = "account_type"
+        case accountRoutings = "account_routings"
     }
 }
 
-struct BalanceDTO: Decodable {
-    let currency: String
-    let amount: String
+struct AccountRoutingDTO: Decodable {
+    let scheme: String
+    let address: String
 }

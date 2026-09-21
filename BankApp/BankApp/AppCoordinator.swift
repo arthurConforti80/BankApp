@@ -8,7 +8,6 @@
 import UIKit
 import Core
 import FeatureLogin
-import FeatureAccounts
 
 /// Coordinator raiz. Decide qual feature Coordinator inicia o app e faz a
 /// transição entre eles — nenhuma lógica de autenticação ou de dado mora
@@ -27,15 +26,15 @@ public final class AppCoordinator: Coordinator {
 
     @MainActor private func showLogin() {
         let loginCoordinator = LoginCoordinator(navigationController: navigationController) { [weak self] in
-            self?.showAccounts()
+            self?.showHome()
         }
         childCoordinator = loginCoordinator
         loginCoordinator.start()
     }
 
-    @MainActor private func showAccounts() {
-        let accountsCoordinator = AccountsCoordinator(navigationController: navigationController)
-        childCoordinator = accountsCoordinator
-        accountsCoordinator.start()
+    @MainActor private func showHome() {
+        let homeCoordinator = HomeCoordinator(navigationController: navigationController)
+        childCoordinator = homeCoordinator
+        homeCoordinator.start()
     }
 }
