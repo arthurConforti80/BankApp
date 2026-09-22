@@ -12,6 +12,9 @@ import FeatureLogin
 /// Coordinator raiz. Decide qual feature Coordinator inicia o app e faz a
 /// transição entre eles — nenhuma lógica de autenticação ou de dado mora
 /// aqui, só orquestração de navegação entre módulos.
+/// /// aqui, só orquestração de navegação entre módulos.
+/// /// aqui, só orquestração de navegação entre módulos.
+/// /// aqui, só orquestração de navegação entre módulos.
 public final class AppCoordinator: Coordinator {
     private let navigationController: UINavigationController
     private var childCoordinator: Coordinator?
