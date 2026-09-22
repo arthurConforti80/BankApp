@@ -20,19 +20,20 @@ jobs:
         with:
           python-version: '3.12'
 
-      # Faz checkout do repositório privado MCP (branch develop) usando o
-      # próprio actions/checkout para autenticar — mais robusto do que
-      # embutir o token manualmente na URL do pip install.
+      # Faz checkout do repositório privado MCP (branch develop) FORA da
+      # árvore de arquivos do BankApp (runner.temp), para que a varredura
+      # recursiva do audit_core não acabe incluindo as fixtures internas
+      # do próprio servidor MCP.
       - name: Checkout swift-arch-audit-mcp
         uses: actions/checkout@v4
         with:
           repository: arthurConforti80/MCP
           ref: develop
           token: ${{ secrets.MCP_REPO_TOKEN }}
-          path: mcp-repo
+          path: ${{ runner.temp }}/mcp-repo
 
       - name: Instalar swift-arch-audit-mcp
-        run: pip install -e mcp-repo/swift-arch-audit-mcp
+        run: pip install -e ${{ runner.temp }}/mcp-repo/swift-arch-audit-mcp
 
       - name: Rodar auditoria de arquitetura
         id: audit
