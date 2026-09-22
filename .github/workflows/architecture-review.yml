@@ -20,10 +20,12 @@ jobs:
         with:
           python-version: '3.12'
 
-      # Instala o audit_core direto do repositório do servidor MCP — ajuste
-      # a URL abaixo se o nome do repo/usuário for diferente.
+      # Instala o audit_core do repositório privado MCP (branch develop),
+      # autenticando com o token guardado no secret MCP_REPO_TOKEN.
       - name: Instalar swift-arch-audit-mcp
-        run: pip install "git+https://github.com/arthurconforti/swift-arch-audit-mcp.git@main"
+        env:
+          MCP_REPO_TOKEN: ${{ secrets.MCP_REPO_TOKEN }}
+        run: pip install "git+https://x-access-token:${MCP_REPO_TOKEN}@github.com/arthurConforti80/MCP.git@develop"
 
       - name: Rodar auditoria de arquitetura
         id: audit
