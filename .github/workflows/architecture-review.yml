@@ -22,6 +22,17 @@ jobs:
 
       # Instala o audit_core direto do repositório do servidor MCP — ajuste
       # a URL abaixo se o nome do repo/usuário for diferente.
+
+      - name: Debug secret presente?
+        env:
+          MCP_REPO_TOKEN: ${{ secrets.MCP_REPO_TOKEN }}
+        run: |
+          if [ -z "$MCP_REPO_TOKEN" ]; then
+            echo "TOKEN AUSENTE OU VAZIO"
+          else
+            echo "Token presente, comprimento: ${#MCP_REPO_TOKEN} caracteres"
+          fi
+      
       - name: Instalar swift-arch-audit-mcp
         run: pip install "git+https://x-access-token:${MCP_REPO_TOKEN}@github.com/arthurConforti80/MCP.git@develop#subdirectory=swift-arch-audit-mcp"
 
