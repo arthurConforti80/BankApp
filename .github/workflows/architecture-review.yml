@@ -32,6 +32,16 @@ jobs:
           else
             echo "Token presente, comprimento: ${#MCP_REPO_TOKEN} caracteres"
           fi
+
+      - name: Debug - testar token contra a API do GitHub
+        env:
+          MCP_REPO_TOKEN: ${{ secrets.MCP_REPO_TOKEN }}
+        run: |
+          curl -s -o response.json -w "HTTP status: %{http_code}\n" \
+            -H "Authorization: Bearer ${MCP_REPO_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/arthurConforti80/MCP
+          cat response.json  
       
       - name: Instalar swift-arch-audit-mcp
         run: pip install "git+https://${MCP_REPO_TOKEN}@github.com/arthurConforti80/MCP.git@develop#subdirectory=swift-arch-audit-mcp"
