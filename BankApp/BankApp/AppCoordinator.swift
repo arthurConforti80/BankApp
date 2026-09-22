@@ -17,6 +17,7 @@ public final class AppCoordinator: Coordinator {
     private var childCoordinator: Coordinator?
 
     public init(navigationController: UINavigationController) {
+        print("AppCoordinator initialized")
         self.navigationController = navigationController
     }
 
