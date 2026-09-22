@@ -1,0 +1,87 @@
+name: Architecture Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout BankApp
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Instala o audit_core direto do repositório do servidor MCP — ajuste
+      # a URL abaixo se o nome do repo/usuário for diferente.
+      - name: Instalar swift-arch-audit-mcp
+        run: pip install "git+https://github.com/arthurconforti/swift-arch-audit-mcp.git@main"
+
+      - name: Rodar auditoria de arquitetura
+        id: audit
+        run: |
+          set +e
+          swift-arch-audit-cli --repo . --format markdown --fail-on error > audit-report.md
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          set -e
+
+      - name: Comentar resultado no PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('audit-report.md', 'utf8');
+            const marker = '<!-- swift-arch-audit -->';
+            const commentBody = `${marker}\n${body}`;
+
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.data.find(c => c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: commentBody,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody,
+              });
+            }
+
+      - name: Aprovar PR automaticamente (se limpo)
+        if: steps.audit.outputs.exit_code == '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                event: 'APPROVE',
+                body: '✅ swift-arch-audit: nenhuma violação de arquitetura encontrada.',
+              });
+            } catch (error) {
+              core.warning(`Não foi possível aprovar automaticamente: ${error.message}`);
+            }
+
+      - name: Falhar o job se houver violações
+        if: steps.audit.outputs.exit_code != '0'
+        run: exit 1
