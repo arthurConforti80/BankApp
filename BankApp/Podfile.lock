@@ -6,12 +6,18 @@ PODS:
     - Core
   - FeatureLogin (0.1.0):
     - Core
+  - FeatureProducts (0.1.0):
+    - Core
+  - FeatureTransfer (0.1.0):
+    - Core
 
 DEPENDENCIES:
   - Core (from `Modules/Core`)
   - FeatureAccounts (from `Modules/FeatureAccounts`)
   - FeatureCards (from `Modules/FeatureCards`)
   - FeatureLogin (from `Modules/FeatureLogin`)
+  - FeatureProducts (from `Modules/FeatureProducts`)
+  - FeatureTransfer (from `Modules/FeatureTransfer`)
 
 EXTERNAL SOURCES:
   Core:
@@ -22,13 +28,19 @@ EXTERNAL SOURCES:
     :path: Modules/FeatureCards
   FeatureLogin:
     :path: Modules/FeatureLogin
+  FeatureProducts:
+    :path: Modules/FeatureProducts
+  FeatureTransfer:
+    :path: Modules/FeatureTransfer
 
 SPEC CHECKSUMS:
   Core: 1c686407d508bd8e57919cb861fde11d55442dff
-  FeatureAccounts: 5beb9439f9009d427d295adc4b6425fdb37fd8db
-  FeatureCards: 57674d8382c8612bc9ab28037e75a9d028f6ec5b
-  FeatureLogin: 07d9059856a8b1a333aa5e037997b2a418783676
+  FeatureAccounts: bbd2132e6fdedf4d02c6bd6520877c404cf95fac
+  FeatureCards: 6daa72b5143e0022343c40f58f6f1c498f9e0308
+  FeatureLogin: ec174ad66f8f568a84445ccbeb50108ea8a1e938
+  FeatureProducts: 929535581c674c62a53099a51f4816c537f025ea
+  FeatureTransfer: 5f68ad6d63182051f34769f70ac052bc05db7de0
 
-PODFILE CHECKSUM: 0cfc6979179e0e33b74c017d154e1dc75a44a4da
+PODFILE CHECKSUM: 93b6915d21c551667f250092a6e07b807c0f47ed
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.17.0

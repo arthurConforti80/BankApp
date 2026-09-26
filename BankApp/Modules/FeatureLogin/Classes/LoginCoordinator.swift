@@ -14,17 +14,17 @@ import Core
 /// responsabilidade do LoginUseCase, chamado pela ViewModel.
 public final class LoginCoordinator: Coordinator {
     private let navigationController: UINavigationController
-    private let onFinished: () -> Void
+    private let onFinished: (String) -> Void
 
-    public init(navigationController: UINavigationController, onFinished: @escaping () -> Void) {
+    public init(navigationController: UINavigationController, onFinished: @escaping (String) -> Void) {
         self.navigationController = navigationController
         self.onFinished = onFinished
     }
 
     @MainActor public func start() {
         let viewModel = LoginViewModel(loginUseCase: LoginUseCase())
-        viewModel.onLoginSucceeded = { [weak self] in
-            self?.onFinished()
+        viewModel.onLoginSucceeded = { [weak self] username in
+            self?.onFinished(username)
         }
 
         let loginView = LoginView(viewModel: viewModel)

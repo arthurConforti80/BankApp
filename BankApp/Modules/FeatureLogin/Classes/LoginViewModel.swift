@@ -18,7 +18,7 @@ public final class LoginViewModel: ObservableObject {
     /// Chamado quando o login é bem-sucedido. Quem decide o que fazer com
     /// isso (navegar pra tela de contas) é o Coordinator, não a ViewModel —
     /// ela só avisa que terminou.
-    public var onLoginSucceeded: (() -> Void)?
+    public var onLoginSucceeded: ((String) -> Void)?
 
     private let loginUseCase: LoginUseCaseProtocol
 
@@ -39,7 +39,7 @@ public final class LoginViewModel: ObservableObject {
             do {
                 try await loginUseCase.execute(username: username, password: password)
                 isLoading = false
-                onLoginSucceeded?()
+                onLoginSucceeded?(username)
             } catch {
                 isLoading = false
                 errorMessage = "Não foi possível autenticar. Verifique as credenciais."

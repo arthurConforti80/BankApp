@@ -10,42 +10,44 @@ import Core
 
 public struct CardDetailView: View {
     @ObservedObject private var viewModel: CardDetailViewModel
+    private let onBack: () -> Void
 
-    public init(viewModel: CardDetailViewModel) {
+    public init(viewModel: CardDetailViewModel, onBack: @escaping () -> Void) {
         self.viewModel = viewModel
+        self.onBack = onBack
     }
 
     public var body: some View {
-        List {
-            Section("Cartão") {
-                Text(viewModel.card.nameOnCard)
-                Text(viewModel.card.maskedNumber)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
+        ZStack {
+            BankAppTheme.Color.cream.ignoresSafeArea()
 
-            Section("Últimas transações da conta vinculada") {
-                if viewModel.isLoading {
-                    ProgressView()
-                } else if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                        .foregroundStyle(.red)
-                } else if viewModel.transactions.isEmpty {
-                    Text("Nenhuma transação encontrada.")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(viewModel.transactions) { transaction in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(transaction.description)
-                            Text("\(transaction.amount) \(transaction.currency)")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 0) {
+                DetailHeader(title: "Cartão", onBack: onBack)
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 28) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(viewModel.card.nameOnCard)
+                                .font(BankAppTheme.Typography.display(22, weight: .bold))
+                                .foregroundStyle(BankAppTheme.Color.ink)
+                            Text(viewModel.card.maskedNumber)
+                                .font(BankAppTheme.Typography.body(13))
+                                .foregroundStyle(BankAppTheme.Color.mutedText)
                         }
+
+                        TransactionsSection(
+                            isLoading: viewModel.isLoading,
+                            errorMessage: viewModel.errorMessage,
+                            transactions: viewModel.transactions
+                        )
                     }
+                    .padding(.horizontal, 28)
+                    .padding(.top, 24)
+                    .padding(.bottom, 24)
                 }
             }
         }
-        .navigationTitle(viewModel.card.nameOnCard)
+        .navigationBarHidden(true)
         .onAppear {
             viewModel.loadTransactions()
         }

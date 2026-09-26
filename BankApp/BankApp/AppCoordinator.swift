@@ -26,15 +26,15 @@ public final class AppCoordinator: Coordinator {
     }
 
     @MainActor private func showLogin() {
-        let loginCoordinator = LoginCoordinator(navigationController: navigationController) { [weak self] in
-            self?.showHome()
+        let loginCoordinator = LoginCoordinator(navigationController: navigationController) { [weak self] username in
+            self?.showHome(username: username)
         }
         childCoordinator = loginCoordinator
         loginCoordinator.start()
     }
 
-    @MainActor private func showHome() {
-        let homeCoordinator = HomeCoordinator(navigationController: navigationController)
+    @MainActor private func showHome(username: String) {
+        let homeCoordinator = HomeCoordinator(navigationController: navigationController, username: username)
         childCoordinator = homeCoordinator
         homeCoordinator.start()
     }

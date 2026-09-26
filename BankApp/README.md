@@ -14,14 +14,24 @@ BankApp.xcodeproj      # criar localmente (ver "Abrindo no Xcode" abaixo)
 Podfile
 BankApp/
   BankAppApp.swift      # entry point SwiftUI, hospeda o UINavigationController
-  AppCoordinator.swift  # coordinator raiz: decide Login -> Accounts
+  AppCoordinator.swift  # coordinator raiz: decide Login -> Home
+  HomeView.swift         # combina Contas, Cartões, Transferência e Produtos
+  HomeViewModel.swift    # só aqui, porque precisa conhecer as 3 features de dado ao mesmo tempo
+  HomeCoordinator.swift  # navega Home -> Detalhe da conta / Detalhe do cartão / Transferência
 Modules/
   Core/
     Core.podspec
     Classes/
-      Coordinator.swift     # protocolo base de todo Coordinator
-      Account.swift          # Entity de domínio
-      OBPAPIClient.swift      # client compartilhado (DirectLogin + requests)
+      Coordinator.swift        # protocolo base de todo Coordinator
+      Account.swift             # Entity de domínio
+      CreditCard.swift           # Entity de domínio
+      Transaction.swift           # Entity de domínio
+      Product.swift                 # Entity de domínio
+      OBPAPIClient.swift             # client compartilhado (DirectLogin + requests genéricos)
+      TransactionsService.swift       # extrato compartilhado entre FeatureAccounts e FeatureCards
+      Theme.swift                      # paleta e tipografia compartilhadas
+      DetailHeader.swift                # cabeçalho compartilhado das telas de detalhe
+      TransactionsSection.swift          # bloco "Últimas transações" compartilhado
   FeatureLogin/
     FeatureLogin.podspec
     Classes/
@@ -33,12 +43,37 @@ Modules/
   FeatureAccounts/
     FeatureAccounts.podspec
     Classes/
-      AccountsListView.swift
-      AccountsViewModel.swift
-      AccountsCoordinator.swift
+      AccountDetailView.swift
+      AccountDetailViewModel.swift
       AccountsUseCase.swift
       AccountsResponseDTO.swift
+  FeatureCards/
+    FeatureCards.podspec
+    Classes/
+      CardDetailView.swift
+      CardDetailViewModel.swift
+      CardsUseCase.swift
+      CardsResponseDTO.swift
+  FeatureTransfer/
+    FeatureTransfer.podspec
+    Classes/
+      TransferView.swift
+      TransferViewModel.swift
+      TransferUseCase.swift
+      TransactionRequestDTO.swift
+  FeatureProducts/
+    FeatureProducts.podspec
+    Classes/
+      ProductsUseCase.swift
+      ProductsResponseDTO.swift
 ```
+
+Nenhum feature module importa outro diretamente — quando uma tela precisa de
+mais de uma feature ao mesmo tempo (a Home, combinando Contas + Cartões +
+Produtos, ou o Detalhe do cartão mostrando o extrato da conta vinculada), a
+composição acontece no target do app (`HomeViewModel`/`HomeCoordinator`) ou
+via um tipo compartilhado no `Core` (`TransactionsService`, `DetailHeader`,
+`Theme`) — nunca via import cruzado entre `Feature*`.
 
 ## Backend: Open Bank Project sandbox
 
