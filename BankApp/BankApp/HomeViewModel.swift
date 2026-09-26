@@ -22,12 +22,32 @@ final class HomeViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
 
+    /// Usuário OBP autenticado (ex.: "Robert.Us.01"), só pra saudação e
+    /// avatar da Home — a API não devolve nome de exibição.
+    let username: String
+
     private let accountsUseCase: AccountsUseCaseProtocol
     private let cardsUseCase: CardsUseCaseProtocol
 
-    init(accountsUseCase: AccountsUseCaseProtocol, cardsUseCase: CardsUseCaseProtocol) {
+    init(username: String, accountsUseCase: AccountsUseCaseProtocol, cardsUseCase: CardsUseCaseProtocol) {
+        self.username = username
         self.accountsUseCase = accountsUseCase
         self.cardsUseCase = cardsUseCase
+    }
+
+    /// Primeiro nome extraído do usuário (ex.: "Robert.Us.01" -> "Robert").
+    var displayName: String {
+        username.split(separator: ".").first.map(String.init) ?? username
+    }
+
+    /// Iniciais pro avatar: uma letra de cada um dos dois primeiros
+    /// componentes alfabéticos do usuário (ex.: "Robert.Us.01" -> "RU").
+    var initials: String {
+        let letterComponents = username
+            .split(separator: ".")
+            .filter { $0.contains(where: { $0.isLetter }) }
+        let letters = letterComponents.prefix(2).compactMap { $0.first }
+        return String(letters).uppercased()
     }
 
     func load() {

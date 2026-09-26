@@ -14,56 +14,168 @@ struct HomeView: View {
     let onSelectCard: (CreditCard) -> Void
 
     var body: some View {
-        Group {
-            if viewModel.isLoading {
-                ProgressView("Carregando...")
-            } else if let errorMessage = viewModel.errorMessage {
-                Text(errorMessage)
-                    .foregroundStyle(.red)
-            } else {
-                List {
-                    Section("Contas") {
-                        if viewModel.accounts.isEmpty {
-                            Text("Nenhuma conta encontrada.")
-                                .foregroundStyle(.secondary)
-                        } else {
-                            ForEach(viewModel.accounts) { account in
-                                Button {
-                                    onSelectAccount(account)
-                                } label: {
-                                    Text(account.label)
-                                        .foregroundStyle(.primary)
-                                }
-                            }
-                        }
-                    }
+        ZStack {
+            BankAppTheme.Color.cream.ignoresSafeArea()
 
-                    Section("Cartões") {
-                        if viewModel.cards.isEmpty {
-                            Text("Nenhum cartão encontrado.")
-                                .foregroundStyle(.secondary)
-                        } else {
-                            ForEach(viewModel.cards) { card in
-                                Button {
-                                    onSelectCard(card)
-                                } label: {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(card.nameOnCard)
-                                            .foregroundStyle(.primary)
-                                        Text(card.maskedNumber)
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
+            Group {
+                if viewModel.isLoading {
+                    ProgressView("Carregando...")
+                } else if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .foregroundStyle(BankAppTheme.Color.negative)
+                } else {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 32) {
+                            header
+
+                            sectionList(
+                                title: "Contas",
+                                isEmpty: viewModel.accounts.isEmpty,
+                                emptyText: "Nenhuma conta encontrada."
+                            ) {
+                                ForEach(Array(viewModel.accounts.enumerated()), id: \.element.id) { index, account in
+                                    if index > 0 {
+                                        Divider().overlay(BankAppTheme.Color.hairline)
                                     }
+                                    Button {
+                                        onSelectAccount(account)
+                                    } label: {
+                                        accountRow(account)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+
+                            sectionList(
+                                title: "Cartões",
+                                isEmpty: viewModel.cards.isEmpty,
+                                emptyText: "Nenhum cartão encontrado."
+                            ) {
+                                ForEach(Array(viewModel.cards.enumerated()), id: \.element.id) { index, card in
+                                    if index > 0 {
+                                        Divider().overlay(BankAppTheme.Color.hairline)
+                                    }
+                                    Button {
+                                        onSelectCard(card)
+                                    } label: {
+                                        cardRow(card)
+                                    }
+                                    .buttonStyle(.plain)
                                 }
                             }
                         }
+                        .padding(.horizontal, 28)
+                        .padding(.top, 40)
+                        .padding(.bottom, 24)
                     }
                 }
             }
         }
-        .navigationTitle("BankApp")
+        .navigationBarHidden(true)
         .onAppear {
             viewModel.load()
         }
+    }
+
+    private var header: some View {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Olá,")
+                    .font(BankAppTheme.Typography.body(14))
+                    .foregroundStyle(BankAppTheme.Color.mutedText)
+                Text(viewModel.displayName)
+                    .font(BankAppTheme.Typography.display(24, weight: .bold))
+                    .foregroundStyle(BankAppTheme.Color.ink)
+            }
+
+            Spacer()
+
+            ZStack {
+                Circle().fill(BankAppTheme.Color.emerald)
+                Text(viewModel.initials)
+                    .font(BankAppTheme.Typography.body(14, weight: .semibold))
+                    .foregroundStyle(BankAppTheme.Color.cream)
+            }
+            .frame(width: 44, height: 44)
+        }
+    }
+
+    @ViewBuilder
+    private func sectionList<Content: View>(
+        title: String,
+        isEmpty: Bool,
+        emptyText: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title.uppercased())
+                .font(BankAppTheme.Typography.body(12, weight: .semibold))
+                .tracking(0.5)
+                .foregroundStyle(BankAppTheme.Color.mutedText)
+
+            if isEmpty {
+                Text(emptyText)
+                    .font(BankAppTheme.Typography.body(14))
+                    .foregroundStyle(BankAppTheme.Color.mutedText)
+            } else {
+                VStack(spacing: 0) {
+                    content()
+                }
+                .background(BankAppTheme.Color.cardFill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(BankAppTheme.Color.hairline, lineWidth: 1)
+                )
+            }
+        }
+    }
+
+    private func accountRow(_ account: Account) -> some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(account.label)
+                    .font(BankAppTheme.Typography.body(15, weight: .semibold))
+                    .foregroundStyle(BankAppTheme.Color.ink)
+                if let iban = account.iban {
+                    Text(iban)
+                        .font(BankAppTheme.Typography.body(12))
+                        .foregroundStyle(BankAppTheme.Color.mutedText)
+                }
+            }
+
+            Spacer()
+
+            Text(balanceText(for: account))
+                .font(BankAppTheme.Typography.body(13))
+                .foregroundStyle(BankAppTheme.Color.mutedText)
+        }
+        .padding(16)
+    }
+
+    private func cardRow(_ card: CreditCard) -> some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(BankAppTheme.Color.ink)
+                .frame(width: 40, height: 28)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(card.nameOnCard)
+                    .font(BankAppTheme.Typography.body(15, weight: .semibold))
+                    .foregroundStyle(BankAppTheme.Color.ink)
+                Text(card.maskedNumber)
+                    .font(BankAppTheme.Typography.body(12))
+                    .foregroundStyle(BankAppTheme.Color.mutedText)
+            }
+
+            Spacer()
+        }
+        .padding(16)
+    }
+
+    private func balanceText(for account: Account) -> String {
+        guard let balance = account.balance, let currency = account.currency else {
+            return "Saldo indisponível"
+        }
+        return BankAppTheme.formattedBalance(balance, currency: currency)
     }
 }
