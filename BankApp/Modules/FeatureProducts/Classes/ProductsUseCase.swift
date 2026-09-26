@@ -19,7 +19,13 @@ public final class ProductsUseCase: ProductsUseCaseProtocol {
     private let apiClient: OBPAPIClient
     private let bankId: String
 
-    public init(apiClient: OBPAPIClient = .shared, bankId: String = "inv.01.us.inv") {
+    // Confirmado contra a sandbox real: "inv.01.us.inv" (o banco das
+    // contas do usuário de teste) não tem nenhum produto cadastrado, mas
+    // "inv.01.uk.uk" devolve um catálogo real (hipotecas, cartões,
+    // poupança...). O catálogo de produtos é do banco, não da conta do
+    // usuário, então é normal serem bancos diferentes dentro da mesma
+    // sandbox multi-banco.
+    public init(apiClient: OBPAPIClient = .shared, bankId: String = "inv.01.uk.uk") {
         self.apiClient = apiClient
         self.bankId = bankId
     }

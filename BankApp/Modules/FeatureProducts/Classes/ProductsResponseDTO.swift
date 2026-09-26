@@ -7,10 +7,12 @@
 
 import Foundation
 
-/// Schema aproximado de GET /banks/{bank_id}/products — ainda não
-/// confirmado contra uma resposta real da sandbox (o banco de teste pode
-/// simplesmente não ter produtos cadastrados). Seguindo a mesma lição de
-/// CardsResponseDTO: só o que usamos, tudo opcional exceto o identificador.
+/// Schema de GET /banks/{bank_id}/products, confirmado contra uma resposta
+/// real da sandbox (banco "inv.01.uk.uk" — ver ProductsUseCase). A API
+/// devolve bem mais campos (parent_product_code, more_info_url,
+/// terms_and_conditions_url, meta.license...) — só declaramos aqui o que
+/// realmente usamos, e `description` opcional porque a sandbox às vezes
+/// devolve string vazia em vez de omitir o campo.
 struct ProductsResponseDTO: Decodable {
     let products: [ProductDTO]
 }
