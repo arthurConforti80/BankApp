@@ -12,6 +12,7 @@ struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
     let onSelectAccount: (Account) -> Void
     let onSelectCard: (CreditCard) -> Void
+    let onSelectTransfer: () -> Void
 
     var body: some View {
         ZStack {
@@ -63,6 +64,21 @@ struct HomeView: View {
                                     .buttonStyle(.plain)
                                 }
                             }
+
+                            transferSection
+
+                            sectionList(
+                                title: "Produtos",
+                                isEmpty: viewModel.products.isEmpty,
+                                emptyText: "Não tem produtos relacionados a sua conta"
+                            ) {
+                                ForEach(Array(viewModel.products.enumerated()), id: \.element.id) { index, product in
+                                    if index > 0 {
+                                        Divider().overlay(BankAppTheme.Color.hairline)
+                                    }
+                                    productRow(product)
+                                }
+                            }
                         }
                         .padding(.horizontal, 28)
                         .padding(.top, 40)
@@ -98,6 +114,51 @@ struct HomeView: View {
             }
             .frame(width: 44, height: 44)
         }
+    }
+
+    private var transferSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Transferências".uppercased())
+                .font(BankAppTheme.Typography.body(12, weight: .semibold))
+                .tracking(0.5)
+                .foregroundStyle(BankAppTheme.Color.mutedText)
+
+            Button(action: onSelectTransfer) {
+                transferRow
+            }
+            .buttonStyle(.plain)
+            .disabled(viewModel.accounts.isEmpty)
+            .opacity(viewModel.accounts.isEmpty ? 0.5 : 1)
+        }
+    }
+
+    private var transferRow: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle().fill(BankAppTheme.Color.emerald)
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(BankAppTheme.Color.cream)
+            }
+            .frame(width: 40, height: 40)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Nova transferência")
+                    .font(BankAppTheme.Typography.body(15, weight: .semibold))
+                    .foregroundStyle(BankAppTheme.Color.ink)
+                Text("Entre as suas contas")
+                    .font(BankAppTheme.Typography.body(12))
+                    .foregroundStyle(BankAppTheme.Color.mutedText)
+            }
+
+            Spacer()
+        }
+        .padding(16)
+        .background(BankAppTheme.Color.cardFill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(BankAppTheme.Color.hairline, lineWidth: 1)
+        )
     }
 
     @ViewBuilder
@@ -170,6 +231,21 @@ struct HomeView: View {
             Spacer()
         }
         .padding(16)
+    }
+
+    private func productRow(_ product: Product) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(product.name)
+                .font(BankAppTheme.Typography.body(15, weight: .semibold))
+                .foregroundStyle(BankAppTheme.Color.ink)
+            if let description = product.description, !description.isEmpty {
+                Text(description)
+                    .font(BankAppTheme.Typography.body(12))
+                    .foregroundStyle(BankAppTheme.Color.mutedText)
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func balanceText(for account: Account) -> String {

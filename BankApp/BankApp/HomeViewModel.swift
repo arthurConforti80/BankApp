@@ -10,15 +10,17 @@ import Combine
 import Core
 import FeatureAccounts
 import FeatureCards
+import FeatureProducts
 
 /// Fica no target do app, não em nenhum feature module — ela precisa
-/// conhecer tanto FeatureAccounts quanto FeatureCards pra combinar as duas
-/// listas numa única tela, e só o target de composição pode fazer isso sem
-/// violar a fronteira de módulo entre features.
+/// conhecer FeatureAccounts, FeatureCards e FeatureProducts pra combinar
+/// as três listas numa única tela, e só o target de composição pode fazer
+/// isso sem violar a fronteira de módulo entre features.
 @MainActor
 final class HomeViewModel: ObservableObject {
     @Published var accounts: [Account] = []
     @Published var cards: [CreditCard] = []
+    @Published var products: [Product] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
 
@@ -28,11 +30,18 @@ final class HomeViewModel: ObservableObject {
 
     private let accountsUseCase: AccountsUseCaseProtocol
     private let cardsUseCase: CardsUseCaseProtocol
+    private let productsUseCase: ProductsUseCaseProtocol
 
-    init(username: String, accountsUseCase: AccountsUseCaseProtocol, cardsUseCase: CardsUseCaseProtocol) {
+    init(
+        username: String,
+        accountsUseCase: AccountsUseCaseProtocol,
+        cardsUseCase: CardsUseCaseProtocol,
+        productsUseCase: ProductsUseCaseProtocol
+    ) {
         self.username = username
         self.accountsUseCase = accountsUseCase
         self.cardsUseCase = cardsUseCase
+        self.productsUseCase = productsUseCase
     }
 
     /// Primeiro nome extraído do usuário (ex.: "Robert.Us.01" -> "Robert").
@@ -66,6 +75,12 @@ final class HomeViewModel: ObservableObject {
                 isLoading = false
                 errorMessage = "Não foi possível carregar contas e cartões."
             }
+
+            // Produtos é tratado à parte, best-effort: uma falha aqui (ou
+            // uma sandbox sem produtos cadastrados pro banco) não deve
+            // derrubar a Home inteira — a UI já trata lista vazia como
+            // estado normal, nunca como erro.
+            products = (try? await productsUseCase.fetchProducts()) ?? []
         }
     }
 }

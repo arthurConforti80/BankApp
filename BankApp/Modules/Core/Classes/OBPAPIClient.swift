@@ -100,6 +100,37 @@ public final class OBPAPIClient {
         }
     }
 
+    /// POST genérico, usado pra criar recursos na API (ex.: transaction
+    /// requests de transferência em FeatureTransfer). Segue exatamente o
+    /// mesmo padrão de auth e tratamento de erro do `get`.
+    public func post<T: Decodable, Body: Encodable>(path: String, body: Body, apiVersionOverride: String? = nil) async throws -> T {
+        guard let token = directLoginToken else { throw OBPAPIError.unauthorized }
+        let version = apiVersionOverride ?? apiVersion
+
+        var request = URLRequest(url: baseURL.appendingPathComponent("/obp/\(version)\(path)"))
+        request.httpMethod = "POST"
+        request.setValue("DirectLogin token=\"\(token)\"", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        do {
+            request.httpBody = try JSONEncoder().encode(body)
+        } catch {
+            throw OBPAPIError.decoding(error)
+        }
+
+        let (data, response) = try await performRequest(request)
+        guard let http = response as? HTTPURLResponse else { throw OBPAPIError.invalidResponse }
+        guard 200..<300 ~= http.statusCode else {
+            throw OBPAPIError.server(statusCode: http.statusCode, message: String(data: data, encoding: .utf8))
+        }
+
+        do {
+            return try JSONDecoder().decode(T.self, from: data)
+        } catch {
+            throw OBPAPIError.decoding(error)
+        }
+    }
+
     private func performRequest(_ request: URLRequest) async throws -> (Data, URLResponse) {
         do {
             return try await session.data(for: request)
