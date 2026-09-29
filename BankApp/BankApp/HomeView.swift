@@ -15,6 +15,8 @@ struct HomeView: View {
     let onSelectCard: (CreditCard) -> Void
     let onSelectPayments: () -> Void
 
+    private static let productsSectionID = "produtos-section"
+
     /// Alturas ilustrativas para o mini-gráfico do hero. A sandbox OBP usada
     /// neste projeto não expõe um endpoint de saldo histórico — isto é um
     /// placeholder visual, não dado real, até existir uma fonte pra isso.
@@ -41,68 +43,58 @@ struct HomeView: View {
                     Text(errorMessage)
                         .foregroundStyle(BankAppTheme.Color.negative)
                 } else {
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 28) {
-                            header
-                            heroBalanceCard
-                            quickActions
-                            paymentsSection
-                            fxSection
+                    ScrollViewReader { scrollProxy in
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 28) {
+                                header
+                                heroBalanceCard
+                                quickActions(scrollProxy: scrollProxy)
+                                paymentsSection
+                                fxSection
 
-                            sectionList(
-                                title: "Contas",
-                                isEmpty: viewModel.accounts.isEmpty,
-                                emptyText: "Nenhuma conta encontrada."
-                            ) {
-                                ForEach(Array(viewModel.accounts.enumerated()), id: \.element.id) { index, account in
-                                    if index > 0 {
-                                        Divider().overlay(BankAppTheme.Color.hairline)
+                                sectionList(
+                                    title: "Contas",
+                                    isEmpty: viewModel.accounts.isEmpty,
+                                    emptyText: "Nenhuma conta encontrada."
+                                ) {
+                                    ForEach(Array(viewModel.accounts.enumerated()), id: \.element.id) { index, account in
+                                        if index > 0 {
+                                            Divider().overlay(BankAppTheme.Color.hairline)
+                                        }
+                                        Button {
+                                            onSelectAccount(account)
+                                        } label: {
+                                            accountRow(account)
+                                        }
+                                        .buttonStyle(.plain)
                                     }
-                                    Button {
-                                        onSelectAccount(account)
-                                    } label: {
-                                        accountRow(account)
-                                    }
-                                    .buttonStyle(.plain)
                                 }
-                            }
 
-                            sectionList(
-                                title: "Cartões",
-                                isEmpty: viewModel.cards.isEmpty,
-                                emptyText: "Nenhum cartão encontrado."
-                            ) {
-                                ForEach(Array(viewModel.cards.enumerated()), id: \.element.id) { index, card in
-                                    if index > 0 {
-                                        Divider().overlay(BankAppTheme.Color.hairline)
+                                sectionList(
+                                    title: "Cartões",
+                                    isEmpty: viewModel.cards.isEmpty,
+                                    emptyText: "Nenhum cartão encontrado."
+                                ) {
+                                    ForEach(Array(viewModel.cards.enumerated()), id: \.element.id) { index, card in
+                                        if index > 0 {
+                                            Divider().overlay(BankAppTheme.Color.hairline)
+                                        }
+                                        Button {
+                                            onSelectCard(card)
+                                        } label: {
+                                            cardRow(card)
+                                        }
+                                        .buttonStyle(.plain)
                                     }
-                                    Button {
-                                        onSelectCard(card)
-                                    } label: {
-                                        cardRow(card)
-                                    }
-                                    .buttonStyle(.plain)
                                 }
-                            }
 
-                            spendingSummaryCard
-
-                            sectionList(
-                                title: "Produtos",
-                                isEmpty: viewModel.products.isEmpty,
-                                emptyText: "Não tem produtos relacionados a sua conta"
-                            ) {
-                                ForEach(Array(viewModel.products.enumerated()), id: \.element.id) { index, product in
-                                    if index > 0 {
-                                        Divider().overlay(BankAppTheme.Color.hairline)
-                                    }
-                                    productRow(product)
-                                }
+                                spendingSummaryCard
+                                productsGrid
                             }
+                            .padding(.horizontal, 28)
+                            .padding(.top, 40)
+                            .padding(.bottom, 24)
                         }
-                        .padding(.horizontal, 28)
-                        .padding(.top, 40)
-                        .padding(.bottom, 24)
                     }
                 }
             }
@@ -202,21 +194,23 @@ struct HomeView: View {
 
     // MARK: - Ações rápidas
 
-    private var quickActions: some View {
+    private func quickActions(scrollProxy: ScrollViewProxy) -> some View {
         HStack {
             quickActionIcon(systemImage: "arrow.up.right", label: "Transferir")
             Spacer()
             quickActionIcon(systemImage: "creditcard", label: "Cartões")
             Spacer()
-            quickActionIcon(systemImage: "square.grid.2x2", label: "Produtos")
+            quickActionButton(systemImage: "square.grid.2x2", label: "Produtos") {
+                withAnimation {
+                    scrollProxy.scrollTo(Self.productsSectionID, anchor: .top)
+                }
+            }
             Spacer()
             quickActionIcon(systemImage: "list.bullet", label: "Extrato")
         }
     }
 
-    /// Ícones de referência rápida, sem ação própria — a entrada real pra
-    /// pagamentos é o card "Transferência" logo abaixo (ver
-    /// paymentsSection), igual ao mockup aprovado no canvas.
+    /// Ícone de referência rápida, sem ação própria.
     private func quickActionIcon(systemImage: String, label: String) -> some View {
         VStack(spacing: 8) {
             ZStack {
@@ -234,6 +228,15 @@ struct HomeView: View {
                 .foregroundStyle(BankAppTheme.Color.ink)
         }
         .frame(width: 72)
+    }
+
+    /// Ícone de ação rápida que dispara uma ação real (hoje só "Produtos",
+    /// que rola até o quadro de Produtos mais abaixo na mesma tela).
+    private func quickActionButton(systemImage: String, label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            quickActionIcon(systemImage: systemImage, label: label)
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Pagamentos (entrada pro hub de transferência/beneficiário/recorrente/débito)
@@ -471,19 +474,88 @@ struct HomeView: View {
         .padding(16)
     }
 
-    private func productRow(_ product: Product) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(product.name)
-                .font(BankAppTheme.Typography.body(15, weight: .semibold))
-                .foregroundStyle(BankAppTheme.Color.ink)
-            if let description = product.description, !description.isEmpty {
-                Text(description)
-                    .font(BankAppTheme.Typography.body(12))
+    // MARK: - Produtos (grid de 3 colunas, ícone + nome)
+
+    private var productsGrid: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Produtos".uppercased())
+                .font(BankAppTheme.Typography.body(12, weight: .semibold))
+                .tracking(0.5)
+                .foregroundStyle(BankAppTheme.Color.mutedText)
+
+            if viewModel.products.isEmpty {
+                Text("Não tem produtos relacionados a sua conta")
+                    .font(BankAppTheme.Typography.body(14))
                     .foregroundStyle(BankAppTheme.Color.mutedText)
+            } else {
+                LazyVGrid(
+                    columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())],
+                    spacing: 20
+                ) {
+                    ForEach(viewModel.products) { product in
+                        productCell(product)
+                    }
+                }
+                .padding(18)
+                .background(BankAppTheme.Color.cardFill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(BankAppTheme.Color.hairline, lineWidth: 1)
+                )
             }
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .id(Self.productsSectionID)
+    }
+
+    private func productCell(_ product: Product) -> some View {
+        let icon = iconInfo(for: product)
+        return VStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(BankAppTheme.Color.cream)
+                    .overlay(Circle().stroke(icon.border, lineWidth: 1))
+                Image(systemName: icon.systemName)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(icon.tint)
+            }
+            .frame(width: 48, height: 48)
+
+            Text(product.name)
+                .font(BankAppTheme.Typography.body(11))
+                .foregroundStyle(BankAppTheme.Color.ink)
+                .multilineTextAlignment(.center)
+                .lineLimit(3)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    /// Escolhe um ícone com base em palavras-chave do nome do produto —
+    /// a API não devolve categoria/tipo do produto, só um nome livre, então
+    /// isso é uma heurística (best-effort), não um mapeamento oficial.
+    /// "Premier"/"Gold" ganham um leve destaque dourado pra sinalizar
+    /// produto de categoria mais alta.
+    private func iconInfo(for product: Product) -> (systemName: String, tint: SwiftUI.Color, border: SwiftUI.Color) {
+        let name = product.name.lowercased()
+
+        if name.contains("mortgage") {
+            return ("house", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+        } else if name.contains("gold") {
+            return ("star.circle", BankAppTheme.Color.gold, BankAppTheme.Color.hairline)
+        } else if name.contains("premier") {
+            return ("creditcard", BankAppTheme.Color.gold, BankAppTheme.Color.gold)
+        } else if name.contains("loan") {
+            return ("doc.text.magnifyingglass", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+        } else if name.contains("saving") {
+            return ("banknote", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+        } else if name.contains("overdraft") {
+            return ("arrow.down.circle", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+        } else if name.contains("credit card") || name.contains("mastercard") || name.contains("visa") {
+            return ("creditcard", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+        } else if name.contains("reserve") {
+            return ("lock.shield", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+        } else {
+            return ("square.grid.2x2", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+        }
     }
 
     private func balanceText(for account: Account) -> String {
