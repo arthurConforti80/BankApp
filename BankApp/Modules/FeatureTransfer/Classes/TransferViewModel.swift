@@ -11,16 +11,26 @@ import Core
 
 @MainActor
 public final class TransferViewModel: ObservableObject {
+    public enum Step {
+        case form
+        case challenge
+        case success
+    }
+
     @Published public var destinationIBAN: String = ""
     @Published public var beneficiaryName: String = ""
     @Published public var amountText: String = ""
     @Published public var note: String = ""
+    @Published public var code: String = ""
     @Published public var isSubmitting: Bool = false
     @Published public var errorMessage: String?
-    @Published public var isCompleted: Bool = false
+    @Published public var step: Step = .form
 
     public let fromAccount: Account
     private let transferUseCase: TransferUseCaseProtocol
+
+    private var pendingTransactionRequestId: String?
+    private var pendingChallengeId: String?
 
     public init(fromAccount: Account, transferUseCase: TransferUseCaseProtocol) {
         self.fromAccount = fromAccount
@@ -45,7 +55,7 @@ public final class TransferViewModel: ObservableObject {
 
         Task {
             do {
-                try await transferUseCase.transfer(
+                let outcome = try await transferUseCase.transfer(
                     from: fromAccount,
                     destinationIBAN: destinationIBAN,
                     amount: amount,
@@ -53,10 +63,50 @@ public final class TransferViewModel: ObservableObject {
                     description: note.isEmpty ? "Transferência BankApp" : note
                 )
                 isSubmitting = false
-                isCompleted = true
+
+                switch outcome {
+                case .completed:
+                    step = .success
+                case .challengeRequired(let transactionRequestId, let challengeId):
+                    pendingTransactionRequestId = transactionRequestId
+                    pendingChallengeId = challengeId
+                    step = .challenge
+                }
             } catch {
                 isSubmitting = false
                 errorMessage = "Não foi possível concluir a transferência."
+            }
+        }
+    }
+
+    public func answerChallenge() {
+        errorMessage = nil
+
+        guard !code.trimmingCharacters(in: .whitespaces).isEmpty else {
+            errorMessage = "Informe o código de verificação."
+            return
+        }
+        guard let transactionRequestId = pendingTransactionRequestId, let challengeId = pendingChallengeId else {
+            errorMessage = "Sessão de confirmação expirada, tente novamente."
+            step = .form
+            return
+        }
+
+        isSubmitting = true
+
+        Task {
+            do {
+                try await transferUseCase.answerChallenge(
+                    from: fromAccount,
+                    transactionRequestId: transactionRequestId,
+                    challengeId: challengeId,
+                    code: code
+                )
+                isSubmitting = false
+                step = .success
+            } catch {
+                isSubmitting = false
+                errorMessage = "Código inválido ou expirado."
             }
         }
     }

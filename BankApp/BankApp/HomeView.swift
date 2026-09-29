@@ -7,12 +7,13 @@
 
 import SwiftUI
 import Core
+import FeatureFX
 
 struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
     let onSelectAccount: (Account) -> Void
     let onSelectCard: (CreditCard) -> Void
-    let onSelectTransfer: () -> Void
+    let onSelectPayments: () -> Void
 
     /// Alturas ilustrativas para o mini-gráfico do hero. A sandbox OBP usada
     /// neste projeto não expõe um endpoint de saldo histórico — isto é um
@@ -45,6 +46,8 @@ struct HomeView: View {
                             header
                             heroBalanceCard
                             quickActions
+                            paymentsSection
+                            fxSection
 
                             sectionList(
                                 title: "Contas",
@@ -201,41 +204,20 @@ struct HomeView: View {
 
     private var quickActions: some View {
         HStack {
-            quickActionButton(systemImage: "arrow.up.right", label: "Transferir") {
-                onSelectTransfer()
-            }
-            .disabled(viewModel.accounts.isEmpty)
-            .opacity(viewModel.accounts.isEmpty ? 0.5 : 1)
-
+            quickActionIcon(systemImage: "arrow.up.right", label: "Transferir")
             Spacer()
-
             quickActionIcon(systemImage: "creditcard", label: "Cartões")
-
             Spacer()
-
             quickActionIcon(systemImage: "square.grid.2x2", label: "Produtos")
-
             Spacer()
-
             quickActionIcon(systemImage: "list.bullet", label: "Extrato")
         }
     }
 
-    private func quickActionButton(systemImage: String, label: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            quickActionContent(systemImage: systemImage, label: label)
-        }
-        .buttonStyle(.plain)
-    }
-
-    /// Ícones sem ação própria ainda (não há tela de extrato consolidado,
-    /// nem uma segunda entrada pra Cartões/Produtos além das seções abaixo)
-    /// — ficam só como referência visual rápida, igual ao mockup aprovado.
+    /// Ícones de referência rápida, sem ação própria — a entrada real pra
+    /// pagamentos é o card "Transferência" logo abaixo (ver
+    /// paymentsSection), igual ao mockup aprovado no canvas.
     private func quickActionIcon(systemImage: String, label: String) -> some View {
-        quickActionContent(systemImage: systemImage, label: label)
-    }
-
-    private func quickActionContent(systemImage: String, label: String) -> some View {
         VStack(spacing: 8) {
             ZStack {
                 Circle()
@@ -252,6 +234,113 @@ struct HomeView: View {
                 .foregroundStyle(BankAppTheme.Color.ink)
         }
         .frame(width: 72)
+    }
+
+    // MARK: - Pagamentos (entrada pro hub de transferência/beneficiário/recorrente/débito)
+
+    private var paymentsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Pagamentos".uppercased())
+                .font(BankAppTheme.Typography.body(12, weight: .semibold))
+                .tracking(0.5)
+                .foregroundStyle(BankAppTheme.Color.mutedText)
+
+            Button(action: onSelectPayments) {
+                HStack(spacing: 14) {
+                    ZStack {
+                        Circle().fill(BankAppTheme.Color.emerald)
+                        Image(systemName: "arrow.up.right")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(BankAppTheme.Color.cream)
+                    }
+                    .frame(width: 40, height: 40)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Transferência")
+                            .font(BankAppTheme.Typography.body(15, weight: .semibold))
+                            .foregroundStyle(BankAppTheme.Color.ink)
+                        Text("Nova, beneficiário, recorrente ou débito automático")
+                            .font(BankAppTheme.Typography.body(12))
+                            .foregroundStyle(BankAppTheme.Color.mutedText)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(BankAppTheme.Color.mutedText)
+                }
+                .padding(16)
+                .background(BankAppTheme.Color.cardFill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(BankAppTheme.Color.hairline, lineWidth: 1)
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(viewModel.accounts.isEmpty)
+            .opacity(viewModel.accounts.isEmpty ? 0.5 : 1)
+        }
+    }
+
+    // MARK: - Câmbio
+
+    private var fxSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Câmbio".uppercased())
+                .font(BankAppTheme.Typography.body(12, weight: .semibold))
+                .tracking(0.5)
+                .foregroundStyle(BankAppTheme.Color.mutedText)
+
+            if viewModel.fxRates.isEmpty {
+                Text("Taxas indisponíveis no momento.")
+                    .font(BankAppTheme.Typography.body(14))
+                    .foregroundStyle(BankAppTheme.Color.mutedText)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(Array(viewModel.fxRates.enumerated()), id: \.element.id) { index, rate in
+                        if index > 0 {
+                            Divider().overlay(BankAppTheme.Color.hairline)
+                        }
+                        fxRow(rate)
+                    }
+                }
+                .background(BankAppTheme.Color.cardFill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(BankAppTheme.Color.hairline, lineWidth: 1)
+                )
+            }
+        }
+    }
+
+    private func fxRow(_ rate: FxRate) -> some View {
+        HStack {
+            Text("\(rate.fromCurrency) → \(rate.toCurrency)")
+                .font(BankAppTheme.Typography.body(15, weight: .semibold))
+                .foregroundStyle(BankAppTheme.Color.ink)
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(formattedRate(rate.conversionValue))
+                    .font(BankAppTheme.Typography.body(15, weight: .semibold))
+                    .foregroundStyle(BankAppTheme.Color.ink)
+                Text("1 \(rate.fromCurrency)")
+                    .font(BankAppTheme.Typography.body(11))
+                    .foregroundStyle(BankAppTheme.Color.mutedText)
+            }
+        }
+        .padding(16)
+    }
+
+    private func formattedRate(_ value: Decimal) -> String {
+        let formatter = NumberFormatter()
+        formatter.locale = Locale(identifier: "pt_PT")
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 4
+        formatter.maximumFractionDigits = 4
+        return formatter.string(from: NSDecimalNumber(decimal: value)) ?? "\(value)"
     }
 
     // MARK: - Resumo de gastos

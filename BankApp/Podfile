@@ -12,6 +12,7 @@ target 'BankApp' do
   pod 'FeatureCards', :path => 'Modules/FeatureCards'
   pod 'FeatureTransfer', :path => 'Modules/FeatureTransfer'
   pod 'FeatureProducts', :path => 'Modules/FeatureProducts'
+  pod 'FeatureFX', :path => 'Modules/FeatureFX'
 end
 post_install do |installer|
   installer.pods_project.targets.each do |target|

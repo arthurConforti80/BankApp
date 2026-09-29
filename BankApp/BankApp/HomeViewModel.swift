@@ -11,16 +11,18 @@ import Core
 import FeatureAccounts
 import FeatureCards
 import FeatureProducts
+import FeatureFX
 
 /// Fica no target do app, não em nenhum feature module — ela precisa
-/// conhecer FeatureAccounts, FeatureCards e FeatureProducts pra combinar
-/// as três listas numa única tela, e só o target de composição pode fazer
-/// isso sem violar a fronteira de módulo entre features.
+/// conhecer FeatureAccounts, FeatureCards, FeatureProducts e FeatureFX pra
+/// combinar as listas numa única tela, e só o target de composição pode
+/// fazer isso sem violar a fronteira de módulo entre features.
 @MainActor
 final class HomeViewModel: ObservableObject {
     @Published var accounts: [Account] = []
     @Published var cards: [CreditCard] = []
     @Published var products: [Product] = []
+    @Published var fxRates: [FxRate] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
 
@@ -31,17 +33,20 @@ final class HomeViewModel: ObservableObject {
     private let accountsUseCase: AccountsUseCaseProtocol
     private let cardsUseCase: CardsUseCaseProtocol
     private let productsUseCase: ProductsUseCaseProtocol
+    private let fxUseCase: FxUseCaseProtocol
 
     init(
         username: String,
         accountsUseCase: AccountsUseCaseProtocol,
         cardsUseCase: CardsUseCaseProtocol,
-        productsUseCase: ProductsUseCaseProtocol
+        productsUseCase: ProductsUseCaseProtocol,
+        fxUseCase: FxUseCaseProtocol
     ) {
         self.username = username
         self.accountsUseCase = accountsUseCase
         self.cardsUseCase = cardsUseCase
         self.productsUseCase = productsUseCase
+        self.fxUseCase = fxUseCase
     }
 
     /// Primeiro nome extraído do usuário (ex.: "Robert.Us.01" -> "Robert").
@@ -76,11 +81,12 @@ final class HomeViewModel: ObservableObject {
                 errorMessage = "Não foi possível carregar contas e cartões."
             }
 
-            // Produtos é tratado à parte, best-effort: uma falha aqui (ou
-            // uma sandbox sem produtos cadastrados pro banco) não deve
+            // Produtos e Câmbio são tratados à parte, best-effort: uma
+            // falha aqui (ou uma sandbox sem dados cadastrados) não deve
             // derrubar a Home inteira — a UI já trata lista vazia como
             // estado normal, nunca como erro.
             products = (try? await productsUseCase.fetchProducts()) ?? []
+            fxRates = (try? await fxUseCase.fetchRates()) ?? []
         }
     }
 }
