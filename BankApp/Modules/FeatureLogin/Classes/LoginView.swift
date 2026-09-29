@@ -16,6 +16,10 @@ public struct LoginView: View {
         case username, password
     }
 
+    /// Mesmo placeholder visual do mini-gráfico do hero da Home, só pra
+    /// reforçar a identidade entre as duas telas — não representa dado real.
+    private let heroBarHeights: [CGFloat] = [0.40, 0.65, 0.45, 0.80, 0.60]
+
     public init(viewModel: LoginViewModel) {
         self.viewModel = viewModel
     }
@@ -25,83 +29,111 @@ public struct LoginView: View {
             BankAppTheme.Color.cream.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                Spacer()
+                inkHeader
 
-                VStack(alignment: .leading, spacing: 40) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("BankApp")
-                            .font(BankAppTheme.Typography.display(26, weight: .bold))
-                            .foregroundStyle(BankAppTheme.Color.ink)
-                        Text("Sandbox Open Bank Project")
-                            .font(BankAppTheme.Typography.body(13))
-                            .foregroundStyle(BankAppTheme.Color.mutedText)
-                    }
-
-                    VStack(alignment: .leading, spacing: 24) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Entrar")
-                                .font(BankAppTheme.Typography.display(22, weight: .semibold))
-                                .foregroundStyle(BankAppTheme.Color.ink)
-                            Text("Acesse sua conta para continuar")
-                                .font(BankAppTheme.Typography.body(14))
-                                .foregroundStyle(BankAppTheme.Color.mutedText)
-                        }
-
-                        VStack(alignment: .leading, spacing: 18) {
-                            underlinedField(
-                                label: "Usuário",
-                                placeholder: "Robert.Us.01",
-                                text: $viewModel.username,
-                                field: .username,
-                                isSecure: false
-                            )
-
-                            underlinedField(
-                                label: "Senha",
-                                placeholder: "••••••••••",
-                                text: $viewModel.password,
-                                field: .password,
-                                isSecure: true
-                            )
-                        }
-
-                        if let errorMessage = viewModel.errorMessage {
-                            Text(errorMessage)
-                                .font(BankAppTheme.Typography.body(13))
-                                .foregroundStyle(BankAppTheme.Color.negative)
-                        }
-
-                        Button {
-                            focusedField = nil
-                            viewModel.login()
-                        } label: {
-                            ZStack {
-                                if viewModel.isLoading {
-                                    ProgressView()
-                                        .tint(BankAppTheme.Color.cream)
-                                } else {
-                                    Text("Entrar")
-                                        .font(BankAppTheme.Typography.body(16, weight: .semibold))
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 52)
-                        }
-                        .foregroundStyle(BankAppTheme.Color.cream)
-                        .background(BankAppTheme.Color.ink, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-                        .disabled(viewModel.isLoading)
-                    }
-                }
-                .padding(.horizontal, 28)
-
-                Spacer()
-
-                Text("Ambiente de testes — nenhum dado real é utilizado")
-                    .font(BankAppTheme.Typography.body(12))
-                    .foregroundStyle(BankAppTheme.Color.mutedText)
-                    .padding(.bottom, 24)
+                formSheet
+                    .padding(.top, -20)
             }
         }
+        .ignoresSafeArea(edges: .top)
+    }
+
+    private var inkHeader: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("BankApp")
+                    .font(BankAppTheme.Typography.display(30, weight: .bold))
+                    .foregroundStyle(BankAppTheme.Color.cream)
+                Text("Sandbox Open Bank Project")
+                    .font(BankAppTheme.Typography.body(13))
+                    .foregroundStyle(BankAppTheme.Color.mutedOnInk)
+            }
+
+            HStack(alignment: .bottom, spacing: 5) {
+                ForEach(Array(heroBarHeights.enumerated()), id: \.offset) { index, height in
+                    RoundedRectangle(cornerRadius: 2, style: .continuous)
+                        .fill(index >= heroBarHeights.count - 2 ? BankAppTheme.Color.gold : BankAppTheme.Color.barMuted)
+                        .frame(width: 22, height: 28 * height)
+                }
+            }
+            .frame(height: 28, alignment: .bottom)
+        }
+        .padding(.horizontal, 28)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(minHeight: 320)
+        .background(BankAppTheme.Color.ink)
+    }
+
+    private var formSheet: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Entrar")
+                    .font(BankAppTheme.Typography.display(22, weight: .semibold))
+                    .foregroundStyle(BankAppTheme.Color.ink)
+                Text("Acesse sua conta para continuar")
+                    .font(BankAppTheme.Typography.body(14))
+                    .foregroundStyle(BankAppTheme.Color.mutedText)
+            }
+
+            VStack(alignment: .leading, spacing: 18) {
+                underlinedField(
+                    label: "Usuário",
+                    placeholder: "Robert.Us.01",
+                    text: $viewModel.username,
+                    field: .username,
+                    isSecure: false
+                )
+
+                underlinedField(
+                    label: "Senha",
+                    placeholder: "••••••••••",
+                    text: $viewModel.password,
+                    field: .password,
+                    isSecure: true
+                )
+            }
+
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .font(BankAppTheme.Typography.body(13))
+                    .foregroundStyle(BankAppTheme.Color.negative)
+            }
+
+            Button {
+                focusedField = nil
+                viewModel.login()
+            } label: {
+                ZStack {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .tint(BankAppTheme.Color.cream)
+                    } else {
+                        Text("Entrar")
+                            .font(BankAppTheme.Typography.body(16, weight: .semibold))
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+            }
+            .foregroundStyle(BankAppTheme.Color.cream)
+            .background(BankAppTheme.Color.ink, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .disabled(viewModel.isLoading)
+
+            Spacer(minLength: 12)
+
+            Text("Ambiente de testes — nenhum dado real é utilizado")
+                .font(BankAppTheme.Typography.body(12))
+                .foregroundStyle(BankAppTheme.Color.mutedText)
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
+        .padding(.horizontal, 28)
+        .padding(.top, 32)
+        .padding(.bottom, 24)
+        .frame(maxWidth: .infinity)
+        .background(
+            BankAppTheme.Color.cream,
+            in: RoundedRectangle(cornerRadius: 24, style: .continuous)
+        )
     }
 
     @ViewBuilder

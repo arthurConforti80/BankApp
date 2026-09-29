@@ -14,6 +14,21 @@ struct HomeView: View {
     let onSelectCard: (CreditCard) -> Void
     let onSelectTransfer: () -> Void
 
+    /// Alturas ilustrativas para o mini-gráfico do hero. A sandbox OBP usada
+    /// neste projeto não expõe um endpoint de saldo histórico — isto é um
+    /// placeholder visual, não dado real, até existir uma fonte pra isso.
+    private let heroBarHeights: [CGFloat] = [0.40, 0.55, 0.35, 0.70, 0.50, 0.85, 0.65]
+
+    /// Categorias de gastos do mês: também ilustrativas. A OBP não devolve
+    /// categorização de transações nesta sandbox, então isto é um mock
+    /// visual até existir um use case real de categorização de extrato.
+    private let spendingCategories: [(name: String, percent: Double, color: SwiftUI.Color)] = [
+        ("Compras", 0.42, BankAppTheme.Color.emerald),
+        ("Alimentação", 0.27, BankAppTheme.Color.emerald),
+        ("Transporte", 0.18, BankAppTheme.Color.gold),
+        ("Outros", 0.13, BankAppTheme.Color.gold)
+    ]
+
     var body: some View {
         ZStack {
             BankAppTheme.Color.cream.ignoresSafeArea()
@@ -26,8 +41,10 @@ struct HomeView: View {
                         .foregroundStyle(BankAppTheme.Color.negative)
                 } else {
                     ScrollView {
-                        VStack(alignment: .leading, spacing: 32) {
+                        VStack(alignment: .leading, spacing: 28) {
                             header
+                            heroBalanceCard
+                            quickActions
 
                             sectionList(
                                 title: "Contas",
@@ -65,7 +82,7 @@ struct HomeView: View {
                                 }
                             }
 
-                            transferSection
+                            spendingSummaryCard
 
                             sectionList(
                                 title: "Produtos",
@@ -116,49 +133,181 @@ struct HomeView: View {
         }
     }
 
-    private var transferSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Transferências".uppercased())
-                .font(BankAppTheme.Typography.body(12, weight: .semibold))
-                .tracking(0.5)
-                .foregroundStyle(BankAppTheme.Color.mutedText)
+    // MARK: - Hero (saldo total + mini-gráfico)
 
-            Button(action: onSelectTransfer) {
-                transferRow
+    private var heroBalanceCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Saldo total")
+                        .font(BankAppTheme.Typography.body(12))
+                        .foregroundStyle(BankAppTheme.Color.mutedOnInk)
+                    Text(totalBalanceText)
+                        .font(BankAppTheme.Typography.display(28, weight: .semibold))
+                        .foregroundStyle(BankAppTheme.Color.cream)
+                }
+
+                Spacer()
+
+                if hasKnownBalance {
+                    Text("+3,2%")
+                        .font(BankAppTheme.Typography.body(11, weight: .semibold))
+                        .foregroundStyle(BankAppTheme.Color.ink)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(BankAppTheme.Color.gold, in: Capsule())
+                }
             }
-            .buttonStyle(.plain)
+
+            HStack(alignment: .bottom, spacing: 5) {
+                ForEach(Array(heroBarHeights.enumerated()), id: \.offset) { index, height in
+                    RoundedRectangle(cornerRadius: 3, style: .continuous)
+                        .fill(index >= heroBarHeights.count - 2 ? BankAppTheme.Color.gold : BankAppTheme.Color.barMuted)
+                        .frame(height: 40 * height)
+                }
+            }
+            .frame(height: 40, alignment: .bottom)
+
+            Text("Últimos 7 dias")
+                .font(BankAppTheme.Typography.body(11))
+                .foregroundStyle(BankAppTheme.Color.mutedOnInk)
+        }
+        .padding(20)
+        .background(BankAppTheme.Color.ink, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var hasKnownBalance: Bool {
+        viewModel.accounts.contains { $0.balance != nil }
+    }
+
+    /// Soma os saldos conhecidos quando todas as contas com saldo estão na
+    /// mesma moeda; caso contrário (ou sem nenhum saldo conhecido) mostra o
+    /// mesmo texto de indisponibilidade já usado nas linhas de conta, para
+    /// nunca exibir um valor inventado.
+    private var totalBalanceText: String {
+        let knownAccounts = viewModel.accounts.compactMap { account -> (Decimal, String)? in
+            guard let balance = account.balance, let currency = account.currency else { return nil }
+            return (balance, currency)
+        }
+        guard let firstCurrency = knownAccounts.first?.1,
+              knownAccounts.allSatisfy({ $0.1 == firstCurrency }) else {
+            return "Saldo indisponível"
+        }
+        let total = knownAccounts.reduce(Decimal(0)) { $0 + $1.0 }
+        return BankAppTheme.formattedBalance(total, currency: firstCurrency)
+    }
+
+    // MARK: - Ações rápidas
+
+    private var quickActions: some View {
+        HStack {
+            quickActionButton(systemImage: "arrow.up.right", label: "Transferir") {
+                onSelectTransfer()
+            }
             .disabled(viewModel.accounts.isEmpty)
             .opacity(viewModel.accounts.isEmpty ? 0.5 : 1)
+
+            Spacer()
+
+            quickActionIcon(systemImage: "creditcard", label: "Cartões")
+
+            Spacer()
+
+            quickActionIcon(systemImage: "square.grid.2x2", label: "Produtos")
+
+            Spacer()
+
+            quickActionIcon(systemImage: "list.bullet", label: "Extrato")
         }
     }
 
-    private var transferRow: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                Circle().fill(BankAppTheme.Color.emerald)
-                Image(systemName: "arrow.up.right")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(BankAppTheme.Color.cream)
-            }
-            .frame(width: 40, height: 40)
+    private func quickActionButton(systemImage: String, label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            quickActionContent(systemImage: systemImage, label: label)
+        }
+        .buttonStyle(.plain)
+    }
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Nova transferência")
-                    .font(BankAppTheme.Typography.body(15, weight: .semibold))
+    /// Ícones sem ação própria ainda (não há tela de extrato consolidado,
+    /// nem uma segunda entrada pra Cartões/Produtos além das seções abaixo)
+    /// — ficam só como referência visual rápida, igual ao mockup aprovado.
+    private func quickActionIcon(systemImage: String, label: String) -> some View {
+        quickActionContent(systemImage: systemImage, label: label)
+    }
+
+    private func quickActionContent(systemImage: String, label: String) -> some View {
+        VStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(BankAppTheme.Color.cream)
+                    .overlay(Circle().stroke(BankAppTheme.Color.hairline, lineWidth: 1))
+                Image(systemName: systemImage)
+                    .font(.system(size: 17, weight: .medium))
                     .foregroundStyle(BankAppTheme.Color.ink)
-                Text("Entre as suas contas")
+            }
+            .frame(width: 52, height: 52)
+
+            Text(label)
+                .font(BankAppTheme.Typography.body(11))
+                .foregroundStyle(BankAppTheme.Color.ink)
+        }
+        .frame(width: 72)
+    }
+
+    // MARK: - Resumo de gastos
+
+    private var spendingSummaryCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("Gastos do mês".uppercased())
+                    .font(BankAppTheme.Typography.body(12, weight: .semibold))
+                    .tracking(0.5)
+                    .foregroundStyle(BankAppTheme.Color.mutedText)
+                Spacer()
+                Text(currentMonthName)
                     .font(BankAppTheme.Typography.body(12))
                     .foregroundStyle(BankAppTheme.Color.mutedText)
             }
 
-            Spacer()
+            VStack(spacing: 14) {
+                ForEach(spendingCategories, id: \.name) { category in
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text(category.name)
+                                .font(BankAppTheme.Typography.body(13))
+                                .foregroundStyle(BankAppTheme.Color.ink)
+                            Spacer()
+                            Text("\(Int(category.percent * 100))%")
+                                .font(BankAppTheme.Typography.body(13))
+                                .foregroundStyle(BankAppTheme.Color.mutedText)
+                        }
+
+                        GeometryReader { geometry in
+                            ZStack(alignment: .leading) {
+                                Capsule().fill(BankAppTheme.Color.trackFill)
+                                Capsule()
+                                    .fill(category.color)
+                                    .frame(width: geometry.size.width * category.percent)
+                            }
+                        }
+                        .frame(height: 6)
+                    }
+                }
+            }
+            .padding(18)
+            .background(BankAppTheme.Color.cardFill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(BankAppTheme.Color.hairline, lineWidth: 1)
+            )
         }
-        .padding(16)
-        .background(BankAppTheme.Color.cardFill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(BankAppTheme.Color.hairline, lineWidth: 1)
-        )
+    }
+
+    private var currentMonthName: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "pt_PT")
+        formatter.dateFormat = "LLLL"
+        return formatter.string(from: Date()).capitalized
     }
 
     @ViewBuilder
