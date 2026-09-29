@@ -7,19 +7,31 @@
 
 import Foundation
 
-/// Body de POST .../counterparties. `currency` é obrigatório — confirmado
-/// em 29/09/2026 contra a sandbox real (erro 400 "No usable value for
-/// currency" ao omiti-lo). Os demais campos seguem a doc pública da OBP
-/// e ainda não foram validados individualmente contra uma resposta 2xx.
+/// Body de POST .../counterparties (schema PostCounterpartyJson400 do
+/// OBP v4.0.0). A sandbox exige TODOS os campos abaixo presentes no JSON
+/// (mesmo que vazios) — confirmado em 29/09/2026 via erros 400
+/// sucessivos: "No usable value for currency" e depois "No usable value
+/// for other_account_secondary_routing_scheme". `bespoke` aceita array
+/// vazio.
 struct CreateCounterpartyRequestDTO: Encodable {
     let name: String
     let description: String?
     let currency: String
     let other_account_routing_scheme: String
     let other_account_routing_address: String
+    let other_account_secondary_routing_scheme: String
+    let other_account_secondary_routing_address: String
     let other_bank_routing_scheme: String
     let other_bank_routing_address: String
+    let other_branch_routing_scheme: String
+    let other_branch_routing_address: String
     let is_beneficiary: Bool
+    let bespoke: [BespokeItemDTO]
+}
+
+struct BespokeItemDTO: Encodable {
+    let key: String
+    let value: String
 }
 
 struct CounterpartyResponseDTO: Decodable {

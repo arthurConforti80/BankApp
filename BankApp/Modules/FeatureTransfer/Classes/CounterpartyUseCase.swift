@@ -41,9 +41,14 @@ public final class CounterpartyUseCase: CounterpartyUseCaseProtocol {
             currency: account.currency ?? "EUR",
             other_account_routing_scheme: "IBAN",
             other_account_routing_address: iban,
+            other_account_secondary_routing_scheme: "",
+            other_account_secondary_routing_address: "",
             other_bank_routing_scheme: "BIC",
             other_bank_routing_address: bankName ?? "",
-            is_beneficiary: true
+            other_branch_routing_scheme: "",
+            other_branch_routing_address: "",
+            is_beneficiary: true,
+            bespoke: []
         )
         let _: CounterpartyResponseDTO = try await apiClient.post(
             path: "/banks/\(account.bankId)/accounts/\(account.id)/owner/counterparties",
