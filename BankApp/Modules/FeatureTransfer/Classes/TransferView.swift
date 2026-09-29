@@ -24,10 +24,13 @@ public struct TransferView: View {
             VStack(alignment: .leading, spacing: 0) {
                 DetailHeader(title: "Nova transferência", onBack: onBack)
 
-                if viewModel.isCompleted {
-                    successView
-                } else {
+                switch viewModel.step {
+                case .form:
                     formView
+                case .challenge:
+                    challengeView
+                case .success:
+                    successView
                 }
             }
         }
@@ -41,30 +44,23 @@ public struct TransferView: View {
                 destinationSection
                 amountSection
 
+                Text("Transferências acima de um certo valor pedem um código extra de confirmação, enviado ao seu dispositivo.")
+                    .font(BankAppTheme.Typography.body(12))
+                    .foregroundStyle(BankAppTheme.Color.mutedText)
+                    .padding(14)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(BankAppTheme.Color.cardFill, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(BankAppTheme.Color.hairline, lineWidth: 1))
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .font(BankAppTheme.Typography.body(13))
                         .foregroundStyle(BankAppTheme.Color.negative)
                 }
 
-                Button {
+                primaryButton(title: "Transferir", isLoading: viewModel.isSubmitting) {
                     viewModel.submit()
-                } label: {
-                    ZStack {
-                        if viewModel.isSubmitting {
-                            ProgressView()
-                                .tint(BankAppTheme.Color.cream)
-                        } else {
-                            Text("Transferir")
-                                .font(BankAppTheme.Typography.body(16, weight: .semibold))
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 52)
                 }
-                .foregroundStyle(BankAppTheme.Color.cream)
-                .background(BankAppTheme.Color.ink, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-                .disabled(viewModel.isSubmitting)
             }
             .padding(.horizontal, 28)
             .padding(.top, 12)
@@ -137,6 +133,60 @@ public struct TransferView: View {
         }
     }
 
+    private var challengeView: some View {
+        VStack(alignment: .leading, spacing: 26) {
+            VStack(spacing: 10) {
+                ZStack {
+                    Circle().fill(BankAppTheme.Color.ink)
+                    Image(systemName: "lock.shield")
+                        .font(.system(size: 22, weight: .medium))
+                        .foregroundStyle(BankAppTheme.Color.cream)
+                }
+                .frame(width: 56, height: 56)
+
+                Text("Confirme com um código")
+                    .font(BankAppTheme.Typography.display(20, weight: .semibold))
+                    .foregroundStyle(BankAppTheme.Color.ink)
+
+                Text("Esta transferência precisa de verificação extra (SANDBOX_TAN). Digite o código de 6 dígitos enviado ao seu dispositivo.")
+                    .font(BankAppTheme.Typography.body(13))
+                    .foregroundStyle(BankAppTheme.Color.mutedText)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 280)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 24)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Código de verificação")
+                    .font(BankAppTheme.Typography.body(12))
+                    .foregroundStyle(BankAppTheme.Color.mutedText)
+
+                TextField("123456", text: $viewModel.code)
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 24, weight: .semibold, design: .default))
+                    .tracking(6)
+                    .foregroundStyle(BankAppTheme.Color.ink)
+                    .padding(.vertical, 8)
+
+                Rectangle().fill(BankAppTheme.Color.hairline).frame(height: 1.5)
+            }
+
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .font(BankAppTheme.Typography.body(13))
+                    .foregroundStyle(BankAppTheme.Color.negative)
+            }
+
+            primaryButton(title: "Confirmar código", isLoading: viewModel.isSubmitting) {
+                viewModel.answerChallenge()
+            }
+        }
+        .padding(.horizontal, 28)
+        .padding(.bottom, 32)
+    }
+
     @ViewBuilder
     private func underlinedField(label: String, placeholder: String, text: Binding<String>) -> some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -153,6 +203,25 @@ public struct TransferView: View {
                 .fill(BankAppTheme.Color.hairline)
                 .frame(height: 1.5)
         }
+    }
+
+    private func primaryButton(title: String, isLoading: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            ZStack {
+                if isLoading {
+                    ProgressView()
+                        .tint(BankAppTheme.Color.cream)
+                } else {
+                    Text(title)
+                        .font(BankAppTheme.Typography.body(16, weight: .semibold))
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+        }
+        .foregroundStyle(BankAppTheme.Color.cream)
+        .background(BankAppTheme.Color.ink, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .disabled(isLoading)
     }
 
     private var successView: some View {
@@ -176,7 +245,7 @@ public struct TransferView: View {
                 .frame(maxWidth: 280)
 
             Button(action: onBack) {
-                Text("Voltar à Home")
+                Text("Voltar aos pagamentos")
                     .font(BankAppTheme.Typography.body(16, weight: .semibold))
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)

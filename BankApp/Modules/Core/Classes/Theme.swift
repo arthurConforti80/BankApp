@@ -26,6 +26,17 @@ public enum BankAppTheme {
         public static let cardFill = SwiftUI.Color.white.opacity(0.6)
         public static let positive = emerald
         public static let negative = SwiftUI.Color(red: 0x9B / 255, green: 0x2E / 255, blue: 0x2E / 255)
+
+        /// Tons usados sobre o fundo ink (hero da Home, painel do Login):
+        /// uma variação mais clara do ink para elementos decorativos (barras
+        /// do mini-gráfico) e um cinza-verde claro para texto secundário
+        /// que precisa de contraste sobre `ink`, já que `mutedText` não tem
+        /// contraste suficiente ali.
+        public static let barMuted = SwiftUI.Color(red: 0x3A / 255, green: 0x4A / 255, blue: 0x44 / 255)
+        public static let mutedOnInk = SwiftUI.Color(red: 0xB8 / 255, green: 0xBD / 255, blue: 0xB6 / 255)
+
+        /// Trilho de fundo das barras de progresso (resumo de gastos).
+        public static let trackFill = SwiftUI.Color(red: 0xEF / 255, green: 0xEA / 255, blue: 0xDA / 255)
     }
 
     public enum Typography {
