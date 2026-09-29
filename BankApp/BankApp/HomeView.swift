@@ -196,7 +196,9 @@ struct HomeView: View {
 
     private func quickActions(scrollProxy: ScrollViewProxy) -> some View {
         HStack {
-            quickActionIcon(systemImage: "arrow.up.right", label: "Transferir")
+            quickActionButton(systemImage: "arrow.up.right", label: "Transferir") {
+                onSelectPayments()
+            }
             Spacer()
             quickActionIcon(systemImage: "creditcard", label: "Cartões")
             Spacer()
