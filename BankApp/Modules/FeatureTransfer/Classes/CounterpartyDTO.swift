@@ -7,14 +7,14 @@
 
 import Foundation
 
-/// Body de POST .../counterparties. Schema NÃO confirmado contra a
-/// sandbox real — a documentação pública lista os campos abaixo como os
-/// usados pela OBP pra registrar um beneficiário por IBAN, mas isso
-/// precisa ser validado no API Explorer antes de qualquer uso além de
-/// protótipo (mesmo cuidado já registrado pra Cartões e Transferência).
+/// Body de POST .../counterparties. `currency` é obrigatório — confirmado
+/// em 29/09/2026 contra a sandbox real (erro 400 "No usable value for
+/// currency" ao omiti-lo). Os demais campos seguem a doc pública da OBP
+/// e ainda não foram validados individualmente contra uma resposta 2xx.
 struct CreateCounterpartyRequestDTO: Encodable {
     let name: String
     let description: String?
+    let currency: String
     let other_account_routing_scheme: String
     let other_account_routing_address: String
     let other_bank_routing_scheme: String

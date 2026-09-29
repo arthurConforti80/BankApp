@@ -38,6 +38,7 @@ public final class CounterpartyUseCase: CounterpartyUseCaseProtocol {
         let body = CreateCounterpartyRequestDTO(
             name: name,
             description: nickname,
+            currency: account.currency ?? "EUR",
             other_account_routing_scheme: "IBAN",
             other_account_routing_address: iban,
             other_bank_routing_scheme: "BIC",
