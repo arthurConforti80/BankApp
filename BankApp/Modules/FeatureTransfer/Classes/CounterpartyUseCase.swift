@@ -9,13 +9,17 @@ import Foundation
 import Core
 
 public protocol CounterpartyUseCaseProtocol {
+    /// Retorna o `counterparty_id` criado, pra ser reaproveitado nos
+    /// formulários de pagamento recorrente e débito automático (ainda
+    /// sem uma tela de listagem de beneficiários).
+    @discardableResult
     func createCounterparty(
         for account: Account,
         name: String,
         nickname: String?,
         iban: String,
         bankName: String?
-    ) async throws
+    ) async throws -> String
 }
 
 /// Registra um beneficiário (counterparty) por IBAN pra uma conta. Ver
@@ -28,13 +32,14 @@ public final class CounterpartyUseCase: CounterpartyUseCaseProtocol {
         self.apiClient = apiClient
     }
 
+    @discardableResult
     public func createCounterparty(
         for account: Account,
         name: String,
         nickname: String?,
         iban: String,
         bankName: String?
-    ) async throws {
+    ) async throws -> String {
         let body = CreateCounterpartyRequestDTO(
             name: name,
             description: nickname,
@@ -50,9 +55,17 @@ public final class CounterpartyUseCase: CounterpartyUseCaseProtocol {
             is_beneficiary: true,
             bespoke: []
         )
-        let _: CounterpartyResponseDTO = try await apiClient.post(
+        let response: CounterpartyResponseDTO = try await apiClient.post(
             path: "/banks/\(account.bankId)/accounts/\(account.id)/owner/counterparties",
             body: body
         )
+        guard let counterpartyId = response.counterparty_id else {
+            throw CounterpartyUseCaseError.missingCounterpartyId
+        }
+        return counterpartyId
     }
+}
+
+public enum CounterpartyUseCaseError: Error {
+    case missingCounterpartyId
 }

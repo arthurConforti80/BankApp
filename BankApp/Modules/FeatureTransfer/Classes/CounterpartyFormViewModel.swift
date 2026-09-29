@@ -18,6 +18,7 @@ public final class CounterpartyFormViewModel: ObservableObject {
     @Published public var isSubmitting: Bool = false
     @Published public var errorMessage: String?
     @Published public var isSaved: Bool = false
+    @Published public var savedCounterpartyId: String?
 
     public let account: Account
     private let useCase: CounterpartyUseCaseProtocol
@@ -43,7 +44,7 @@ public final class CounterpartyFormViewModel: ObservableObject {
 
         Task {
             do {
-                try await useCase.createCounterparty(
+                let counterpartyId = try await useCase.createCounterparty(
                     for: account,
                     name: name,
                     nickname: nickname.isEmpty ? nil : nickname,
@@ -51,6 +52,7 @@ public final class CounterpartyFormViewModel: ObservableObject {
                     bankName: bankName.isEmpty ? nil : bankName
                 )
                 isSubmitting = false
+                savedCounterpartyId = counterpartyId
                 isSaved = true
             } catch {
                 isSubmitting = false

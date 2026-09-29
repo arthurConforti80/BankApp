@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 import Core
 
 public struct CounterpartyFormView: View {
@@ -118,6 +119,10 @@ public struct CounterpartyFormView: View {
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 280)
 
+            if let counterpartyId = viewModel.savedCounterpartyId {
+                counterpartyIdCard(counterpartyId)
+            }
+
             Button(action: onBack) {
                 Text("Voltar aos pagamentos")
                     .font(BankAppTheme.Typography.body(16, weight: .semibold))
@@ -130,5 +135,38 @@ public struct CounterpartyFormView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(24)
+    }
+
+    /// Enquanto não existe uma tela de listagem de beneficiários, exibe
+    /// o ID recém-criado pra ser copiado e colado nos formulários de
+    /// pagamento recorrente e débito automático.
+    @ViewBuilder
+    private func counterpartyIdCard(_ counterpartyId: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("ID do beneficiário (counterparty_id)")
+                .font(BankAppTheme.Typography.body(11))
+                .foregroundStyle(BankAppTheme.Color.mutedText)
+
+            HStack {
+                Text(counterpartyId)
+                    .font(.system(.footnote, design: .monospaced))
+                    .foregroundStyle(BankAppTheme.Color.ink)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+
+                Spacer()
+
+                Button {
+                    UIPasteboard.general.string = counterpartyId
+                } label: {
+                    Image(systemName: "doc.on.doc")
+                        .foregroundStyle(BankAppTheme.Color.ink)
+                }
+            }
+        }
+        .padding(12)
+        .background(BankAppTheme.Color.cardFill, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(BankAppTheme.Color.hairline, lineWidth: 1))
+        .frame(maxWidth: 280)
     }
 }
