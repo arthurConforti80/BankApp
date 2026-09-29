@@ -508,15 +508,16 @@ struct HomeView: View {
     }
 
     private func productCell(_ product: Product) -> some View {
-        let icon = iconInfo(for: product)
-        return VStack(spacing: 8) {
+        VStack(spacing: 8) {
             ZStack {
                 Circle()
                     .fill(BankAppTheme.Color.cream)
-                    .overlay(Circle().stroke(icon.border, lineWidth: 1))
-                Image(systemName: icon.systemName)
-                    .font(.system(size: 18, weight: .medium))
-                    .foregroundStyle(icon.tint)
+                    .overlay(Circle().stroke(BankAppTheme.Color.hairline, lineWidth: 1))
+                Image(systemName: iconName(for: product))
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
+                    .foregroundStyle(BankAppTheme.Color.ink)
             }
             .frame(width: 48, height: 48)
 
@@ -532,29 +533,28 @@ struct HomeView: View {
     /// Escolhe um ícone com base em palavras-chave do nome do produto —
     /// a API não devolve categoria/tipo do produto, só um nome livre, então
     /// isso é uma heurística (best-effort), não um mapeamento oficial.
-    /// "Premier"/"Gold" ganham um leve destaque dourado pra sinalizar
-    /// produto de categoria mais alta.
-    private func iconInfo(for product: Product) -> (systemName: String, tint: SwiftUI.Color, border: SwiftUI.Color) {
+    /// Todos os ícones usam a mesma cor (ink) e o mesmo box (.resizable +
+    /// .scaledToFit em productCell), pra não variar de tamanho entre
+    /// símbolos SF Symbols diferentes nem destacar um produto sobre outro.
+    private func iconName(for product: Product) -> String {
         let name = product.name.lowercased()
 
         if name.contains("mortgage") {
-            return ("house", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+            return "house"
         } else if name.contains("gold") {
-            return ("star.circle", BankAppTheme.Color.gold, BankAppTheme.Color.hairline)
-        } else if name.contains("premier") {
-            return ("creditcard", BankAppTheme.Color.gold, BankAppTheme.Color.gold)
+            return "star"
         } else if name.contains("loan") {
-            return ("doc.text.magnifyingglass", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+            return "doc.text.magnifyingglass"
         } else if name.contains("saving") {
-            return ("banknote", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+            return "banknote"
         } else if name.contains("overdraft") {
-            return ("arrow.down.circle", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
-        } else if name.contains("credit card") || name.contains("mastercard") || name.contains("visa") {
-            return ("creditcard", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+            return "arrow.down.circle"
+        } else if name.contains("credit card") || name.contains("mastercard") || name.contains("visa") || name.contains("premier") {
+            return "creditcard"
         } else if name.contains("reserve") {
-            return ("lock.shield", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+            return "lock.shield"
         } else {
-            return ("square.grid.2x2", BankAppTheme.Color.ink, BankAppTheme.Color.hairline)
+            return "square.grid.2x2"
         }
     }
 
