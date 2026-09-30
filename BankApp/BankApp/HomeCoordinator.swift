@@ -13,6 +13,7 @@ import FeatureCards
 import FeatureProducts
 import FeatureFX
 import FeatureTransfer
+import FeatureCustomer
 
 final class HomeCoordinator: Coordinator {
     private let navigationController: UINavigationController
@@ -38,6 +39,10 @@ final class HomeCoordinator: Coordinator {
             onSelectPayments: { [weak self, weak viewModel] in
                 guard let account = viewModel?.accounts.first else { return }
                 self?.showPaymentsHub(from: account)
+            },
+            onSelectProfile: { [weak self, weak viewModel] in
+                guard let bankId = viewModel?.accounts.first?.bankId else { return }
+                self?.showProfile(bankId: bankId)
             }
         )
         let hostingController = UIHostingController(rootView: homeView)
@@ -100,6 +105,16 @@ final class HomeCoordinator: Coordinator {
     @MainActor private func showDirectDebitForm(from account: Account) {
         let viewModel = DirectDebitFormViewModel(account: account, useCase: DirectDebitUseCase())
         let view = DirectDebitFormView(viewModel: viewModel) { [weak self] in
+            self?.navigationController.popViewController(animated: true)
+        }
+        navigationController.pushViewController(UIHostingController(rootView: view), animated: true)
+    }
+
+    // MARK: - Profile
+
+    @MainActor private func showProfile(bankId: String) {
+        let viewModel = CustomerViewModel(bankId: bankId, useCase: CustomerUseCase())
+        let view = CustomerView(viewModel: viewModel) { [weak self] in
             self?.navigationController.popViewController(animated: true)
         }
         navigationController.pushViewController(UIHostingController(rootView: view), animated: true)

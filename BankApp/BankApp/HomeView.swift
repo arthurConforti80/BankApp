@@ -14,6 +14,7 @@ struct HomeView: View {
     let onSelectAccount: (Account) -> Void
     let onSelectCard: (CreditCard) -> Void
     let onSelectPayments: () -> Void
+    let onSelectProfile: () -> Void
 
     private static let productsSectionID = "produtos-section"
 
@@ -118,13 +119,17 @@ struct HomeView: View {
 
             Spacer()
 
-            ZStack {
-                Circle().fill(BankAppTheme.Color.emerald)
-                Text(viewModel.initials)
-                    .font(BankAppTheme.Typography.body(14, weight: .semibold))
-                    .foregroundStyle(BankAppTheme.Color.cream)
+            Button(action: onSelectProfile) {
+                ZStack {
+                    Circle().fill(BankAppTheme.Color.emerald)
+                    Text(viewModel.initials)
+                        .font(BankAppTheme.Typography.body(14, weight: .semibold))
+                        .foregroundStyle(BankAppTheme.Color.cream)
+                }
+                .frame(width: 44, height: 44)
             }
-            .frame(width: 44, height: 44)
+            .buttonStyle(.plain)
+            .accessibilityLabel("Profile")
         }
     }
 
