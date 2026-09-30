@@ -38,6 +38,8 @@ public final class OBPAPIClient {
     private let apiVersion = "v4.0.0"
     private let session: URLSession
     private var directLoginToken: String?
+    private var cachedUserId: String?
+    private var cachedCustomerIds: [String: String] = [:]
 
     /// Consumer key da aplicação registrada na sandbox OBP. Nunca deve ir
     /// hardcoded aqui — injete via variável de ambiente de build ou
@@ -76,6 +78,29 @@ public final class OBPAPIClient {
     }
 
     public var isAuthenticated: Bool { directLoginToken != nil }
+
+    /// `user_id` do usuário autenticado — exigido no body de Standing
+    /// Order e Direct Debit. Buscado uma vez em `/users/current` (v3.0.0,
+    /// conforme exemplo da doc oficial de DAuth) e cacheado pro resto da
+    /// sessão.
+    public func currentUserId() async throws -> String {
+        if let cachedUserId { return cachedUserId }
+        struct CurrentUserResponse: Decodable { let user_id: String }
+        let response: CurrentUserResponse = try await get(path: "/users/current", apiVersionOverride: "v3.0.0")
+        cachedUserId = response.user_id
+        return response.user_id
+    }
+
+    /// `customer_id` do usuário autenticado NUM BANCO específico (a
+    /// relação customer é por banco) — também exigido em Standing Order e
+    /// Direct Debit. Cacheado por `bankId`.
+    public func currentCustomerId(bankId: String) async throws -> String {
+        if let cached = cachedCustomerIds[bankId] { return cached }
+        struct CurrentCustomerResponse: Decodable { let customer_id: String }
+        let response: CurrentCustomerResponse = try await get(path: "/banks/\(bankId)/customer", apiVersionOverride: "v1.4.0")
+        cachedCustomerIds[bankId] = response.customer_id
+        return response.customer_id
+    }
 
     // MARK: - Requests genéricos
 

@@ -35,6 +35,10 @@ public final class StandingOrderUseCase: StandingOrderUseCaseProtocol {
         self.apiClient = apiClient
     }
 
+    /// Sem data final, a OBP ainda exige o campo `date_expires` presente
+    /// no JSON — usamos uma data bem distante em vez de omitir a chave.
+    private static let farFutureExpiry = "2099-12-31T00:00:00Z"
+
     public func createStandingOrder(
         for account: Account,
         counterpartyId: String,
@@ -45,13 +49,18 @@ public final class StandingOrderUseCase: StandingOrderUseCaseProtocol {
         startDate: Date,
         endDate: Date?
     ) async throws {
+        let userId = try await apiClient.currentUserId()
+        let customerId = try await apiClient.currentCustomerId(bankId: account.bankId)
+
         let body = CreateStandingOrderRequestDTO(
+            customer_id: customerId,
+            user_id: userId,
             counterparty_id: counterpartyId,
             amount: CreateStandingOrderRequestDTO.Amount(currency: currency, amount: Self.formattedAmount(amount)),
             when: CreateStandingOrderRequestDTO.When(frequency: frequency, detail: dayOfMonth),
             date_signed: dateFormatter.string(from: Date()),
             date_starts: dateFormatter.string(from: startDate),
-            date_expires: endDate.map { dateFormatter.string(from: $0) }
+            date_expires: endDate.map { dateFormatter.string(from: $0) } ?? Self.farFutureExpiry
         )
         let _: StandingOrderResponseDTO = try await apiClient.post(
             path: "/banks/\(account.bankId)/accounts/\(account.id)/owner/standing-order",
