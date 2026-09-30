@@ -7,10 +7,10 @@
 
 import Foundation
 
-/// Body de POST .../direct-debit (resource-docs da própria sandbox).
-/// `customer_id` e `user_id` são obrigatórios — mesmo problema confirmado
-/// em Standing Order e Counterparty (400 "No usable value" quando
-/// ausentes). `date_expires` também precisa estar sempre presente.
+/// Body for POST .../direct-debit (the sandbox's own resource docs).
+/// `customer_id` and `user_id` are required, the same issue confirmed in
+/// Standing Order and Counterparty (400 "No usable value" when missing).
+/// `date_expires` also needs to always be present.
 struct CreateDirectDebitRequestDTO: Encodable {
     let customer_id: String
     let user_id: String

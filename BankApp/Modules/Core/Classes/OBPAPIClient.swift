@@ -7,8 +7,8 @@
 
 import Foundation
 
-/// Erros de rede/API expostos pelo client. Os UseCases traduzem isso em
-/// mensagem amigável para a ViewModel — o client não sabe nada de UI.
+/// Network/API errors exposed by the client. UseCases translate these into
+/// a friendly message for the ViewModel. The client knows nothing about UI.
 public enum OBPAPIError: Error {
     case invalidResponse
     case unauthorized
@@ -17,20 +17,21 @@ public enum OBPAPIError: Error {
     case transport(Error)
 }
 
-/// Cliente compartilhado da API sandbox do Open Bank Project
-/// (https://apisandbox.openbankproject.com — ver API Explorer em
-/// https://apiexplorersandbox.openbankproject.com para confirmar payloads
-/// exatos por versão de endpoint antes de usar em produção).
+/// Shared client for the Open Bank Project sandbox API
+/// (https://apisandbox.openbankproject.com. See the API Explorer at
+/// https://apiexplorersandbox.openbankproject.com to confirm exact payloads
+/// per endpoint version before using this in production).
 ///
-/// Implementa o fluxo Direct Login documentado pela OBP:
-/// 1. POST /my/logins/direct com header
+/// Implements the Direct Login flow documented by OBP:
+/// 1. POST /my/logins/direct with header
 ///    `Authorization: DirectLogin username="...", password="...", consumer_key="..."`
-///    retorna um token.
-/// 2. Chamadas seguintes usam `Authorization: DirectLogin token="..."`.
+///    returns a token.
+/// 2. Subsequent calls use `Authorization: DirectLogin token="..."`.
 ///
-/// Este client é intencionalmente "burro": não conhece Account, não conhece
-/// tela nenhuma — só sabe autenticar e fazer requests genéricos. Mapeamento
-/// pra Entity de domínio é responsabilidade de cada UseCase.
+/// This client is intentionally "dumb": it doesn't know about Account, it
+/// doesn't know about any screen, it only knows how to authenticate and make
+/// generic requests. Mapping to a domain Entity is each UseCase's
+/// responsibility.
 public final class OBPAPIClient {
     public static let shared = OBPAPIClient()
 
@@ -41,9 +42,9 @@ public final class OBPAPIClient {
     private var cachedUserId: String?
     private var cachedCustomerIds: [String: String] = [:]
 
-    /// Consumer key da aplicação registrada na sandbox OBP. Nunca deve ir
-    /// hardcoded aqui — injete via variável de ambiente de build ou
-    /// arquivo de configuração ignorado pelo git (ver README).
+    /// Consumer key of the application registered in the OBP sandbox. Should
+    /// never be hardcoded here; inject it via a build environment variable or
+    /// a config file ignored by git (see README).
     private let consumerKey: String
 
     public init(session: URLSession = .shared, consumerKey: String = ProcessInfo.processInfo.environment["OBP_CONSUMER_KEY"] ?? "") {
@@ -51,7 +52,7 @@ public final class OBPAPIClient {
         self.consumerKey = consumerKey
     }
 
-    // MARK: - Autenticação
+    // MARK: - Authentication
 
     public func directLogin(username: String, password: String) async throws {
         var request = URLRequest(url: baseURL.appendingPathComponent("/my/logins/direct"))
@@ -79,10 +80,10 @@ public final class OBPAPIClient {
 
     public var isAuthenticated: Bool { directLoginToken != nil }
 
-    /// `user_id` do usuário autenticado — exigido no body de Standing
-    /// Order e Direct Debit. Buscado uma vez em `/users/current` (v3.0.0,
-    /// conforme exemplo da doc oficial de DAuth) e cacheado pro resto da
-    /// sessão.
+    /// `user_id` of the authenticated user, required in the Standing
+    /// Order and Direct Debit request body. Fetched once from
+    /// `/users/current` (v3.0.0, following the official DAuth doc example)
+    /// and cached for the rest of the session.
     public func currentUserId() async throws -> String {
         if let cachedUserId { return cachedUserId }
         struct CurrentUserResponse: Decodable { let user_id: String }
@@ -91,9 +92,9 @@ public final class OBPAPIClient {
         return response.user_id
     }
 
-    /// `customer_id` do usuário autenticado NUM BANCO específico (a
-    /// relação customer é por banco) — também exigido em Standing Order e
-    /// Direct Debit. Cacheado por `bankId`.
+    /// `customer_id` of the authenticated user AT A SPECIFIC BANK (the
+    /// customer relationship is per bank), also required in Standing Order
+    /// and Direct Debit. Cached by `bankId`.
     public func currentCustomerId(bankId: String) async throws -> String {
         if let cached = cachedCustomerIds[bankId] { return cached }
         struct CurrentCustomerResponse: Decodable { let customer_id: String }
@@ -102,7 +103,7 @@ public final class OBPAPIClient {
         return response.customer_id
     }
 
-    // MARK: - Requests genéricos
+    // MARK: - Generic requests
 
     public func get<T: Decodable>(path: String, apiVersionOverride: String? = nil) async throws -> T {
         guard let token = directLoginToken else { throw OBPAPIError.unauthorized }
@@ -125,9 +126,9 @@ public final class OBPAPIClient {
         }
     }
 
-    /// POST genérico, usado pra criar recursos na API (ex.: transaction
-    /// requests de transferência em FeatureTransfer). Segue exatamente o
-    /// mesmo padrão de auth e tratamento de erro do `get`.
+    /// Generic POST, used to create resources in the API (e.g. transfer
+    /// transaction requests in FeatureTransfer). Follows exactly the same
+    /// auth and error-handling pattern as `get`.
     public func post<T: Decodable, Body: Encodable>(path: String, body: Body, apiVersionOverride: String? = nil) async throws -> T {
         guard let token = directLoginToken else { throw OBPAPIError.unauthorized }
         let version = apiVersionOverride ?? apiVersion

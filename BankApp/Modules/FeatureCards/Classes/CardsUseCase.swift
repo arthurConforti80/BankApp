@@ -23,10 +23,10 @@ public final class CardsUseCase: CardsUseCaseProtocol {
     }
 
     public func fetchCards() async throws -> [CreditCard] {
-        // A documentação pública lista este endpoint sob /obp/v5.0.0/cards,
-        // enquanto o resto do app usa v4.0.0 — sobrescrevemos a versão só
-        // nesta chamada. Confirme no API Explorer se v4.0.0 também expõe o
-        // mesmo caminho antes de depender disso fora de um protótipo.
+        // The public documentation lists this endpoint under /obp/v5.0.0/cards,
+        // while the rest of the app uses v4.0.0, so we override the version
+        // for just this call. Confirm in the API Explorer whether v4.0.0 also
+        // exposes the same path before relying on this outside a prototype.
         let response: CardsResponseDTO = try await apiClient.get(path: "/cards", apiVersionOverride: "v5.0.0")
         return response.cards.compactMap { dto in
             guard let cardId = dto.cardId, let bankId = dto.bankId, let accountId = dto.accountId else {
@@ -42,10 +42,10 @@ public final class CardsUseCase: CardsUseCaseProtocol {
         }
     }
 
-    /// Cartão não tem extrato próprio na OBP — extrato é sempre vinculado
-    /// a uma conta. Por isso buscamos as transações da conta associada ao
-    /// cartão (card.accountId), reaproveitando o mesmo Core.TransactionsService
-    /// que FeatureAccounts usa.
+    /// A card doesn't have its own statement in OBP, a statement is always
+    /// tied to an account. That's why we fetch the transactions for the
+    /// account associated with the card (card.accountId), reusing the same
+    /// Core.TransactionsService that FeatureAccounts uses.
     public func fetchRecentTransactions(for card: CreditCard, limit: Int) async throws -> [Transaction] {
         try await transactionsService.fetchRecentTransactions(bankId: card.bankId, accountId: card.accountId, limit: limit)
     }

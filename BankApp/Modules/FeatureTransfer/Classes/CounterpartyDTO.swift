@@ -7,12 +7,12 @@
 
 import Foundation
 
-/// Body de POST .../counterparties (schema PostCounterpartyJson400 do
-/// OBP v4.0.0). A sandbox exige TODOS os campos abaixo presentes no JSON
-/// (mesmo que vazios) — confirmado em 29/09/2026 via erros 400
-/// sucessivos: "No usable value for currency" e depois "No usable value
-/// for other_account_secondary_routing_scheme". `bespoke` aceita array
-/// vazio.
+/// Body for POST .../counterparties (PostCounterpartyJson400 schema from
+/// OBP v4.0.0). The sandbox requires ALL fields below to be present in the
+/// JSON (even if empty), confirmed on 29/09/2026 via successive 400
+/// errors: "No usable value for currency" and then "No usable value
+/// for other_account_secondary_routing_scheme". `bespoke` accepts an empty
+/// array.
 struct CreateCounterpartyRequestDTO: Encodable {
     let name: String
     let description: String?

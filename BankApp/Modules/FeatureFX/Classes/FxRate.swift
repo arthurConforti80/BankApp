@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// Entity de domínio — taxa de conversão entre duas moedas.
+/// Domain entity, conversion rate between two currencies.
 public struct FxRate: Identifiable, Equatable {
     public var id: String { "\(fromCurrency)\(toCurrency)" }
     public let fromCurrency: String

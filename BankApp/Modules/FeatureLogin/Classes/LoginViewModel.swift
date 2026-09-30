@@ -15,9 +15,9 @@ public final class LoginViewModel: ObservableObject {
     @Published public var isLoading: Bool = false
     @Published public var errorMessage: String?
 
-    /// Chamado quando o login é bem-sucedido. Quem decide o que fazer com
-    /// isso (navegar pra tela de contas) é o Coordinator, não a ViewModel —
-    /// ela só avisa que terminou.
+    /// Called when login succeeds. Deciding what to do with that (navigate
+    /// to the accounts screen) is the Coordinator's job, not the ViewModel's;
+    /// it just announces that it finished.
     public var onLoginSucceeded: ((String) -> Void)?
 
     private let loginUseCase: LoginUseCaseProtocol

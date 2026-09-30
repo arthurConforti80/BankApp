@@ -8,10 +8,10 @@
 import Foundation
 import Core
 
-/// Resultado de uma tentativa de transferência: ou completa direto, ou a
-/// sandbox pede confirmação extra (SANDBOX_TAN) antes de liberar o valor —
-/// o mesmo padrão de um MFA real, disparado pela própria API conforme um
-/// limite configurado no lado do banco, não pelo app.
+/// Result of a transfer attempt: it either completes directly, or the
+/// sandbox asks for extra confirmation (SANDBOX_TAN) before releasing the
+/// amount, the same pattern as real MFA, triggered by the API itself based
+/// on a limit configured on the bank's side, not by the app.
 public enum TransferOutcome {
     case completed
     case challengeRequired(transactionRequestId: String, challengeId: String)
@@ -34,12 +34,12 @@ public protocol TransferUseCaseProtocol {
     ) async throws
 }
 
-/// Cria um transaction request do tipo SEPA na conta de origem. Se a
-/// sandbox devolver status "INITIATED" com um challenge, a UI precisa
-/// responder esse desafio (ver answerChallenge) antes da transferência ser
-/// efetivada — esse fluxo completo ainda NÃO foi validado ponta a ponta
-/// contra a sandbox real (ver comentário em TransactionRequestDTO sobre o
-/// schema do challenge).
+/// Creates a SEPA-type transaction request on the source account. If the
+/// sandbox returns an "INITIATED" status with a challenge, the UI needs to
+/// answer that challenge (see answerChallenge) before the transfer is
+/// finalized. This full flow has NOT yet been validated end to end against
+/// the real sandbox (see the comment on TransactionRequestDTO about the
+/// challenge schema).
 public final class TransferUseCase: TransferUseCaseProtocol {
     private let apiClient: OBPAPIClient
     private let requestType = "SEPA"

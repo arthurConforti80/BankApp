@@ -16,8 +16,9 @@ public struct LoginView: View {
         case username, password
     }
 
-    /// Mesmo placeholder visual do mini-gráfico do hero da Home, só pra
-    /// reforçar a identidade entre as duas telas — não representa dado real.
+    /// Same visual placeholder as the Home hero's mini chart, just to
+    /// reinforce the identity between the two screens. Doesn't represent
+    /// real data.
     private let heroBarHeights: [CGFloat] = [0.40, 0.65, 0.45, 0.80, 0.60]
 
     public init(viewModel: LoginViewModel) {

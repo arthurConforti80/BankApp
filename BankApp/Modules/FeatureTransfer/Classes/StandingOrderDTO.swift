@@ -7,13 +7,13 @@
 
 import Foundation
 
-/// Body de POST .../standing-order (resource-docs da própria sandbox).
-/// `customer_id` e `user_id` são obrigatórios e a sandbox retorna 400
-/// "No usable value" se omitidos — confirmado em 30/09/2026 junto com o
-/// mesmo problema no Counterparty. `date_expires` também precisa estar
-/// sempre presente no JSON (mesmo bug do campo omitido quando nil), por
-/// isso não é mais opcional aqui: sem data final, o UseCase manda uma
-/// data bem no futuro.
+/// Body for POST .../standing-order (the sandbox's own resource docs).
+/// `customer_id` and `user_id` are required and the sandbox returns a 400
+/// "No usable value" if they're omitted, confirmed on 30/09/2026 along
+/// with the same issue in Counterparty. `date_expires` also needs to
+/// always be present in the JSON (the same bug with the field omitted when
+/// nil), which is why it's no longer optional here: with no end date, the
+/// UseCase sends a date far in the future.
 struct CreateStandingOrderRequestDTO: Encodable {
     struct Amount: Encodable {
         let currency: String

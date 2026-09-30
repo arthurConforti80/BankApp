@@ -18,10 +18,10 @@ struct BankAppApp: App {
     }
 }
 
-/// Ponte entre o mundo SwiftUI (App/Scene) e o UINavigationController que o
-/// AppCoordinator usa pra orquestrar as telas. Isso é infraestrutura de
-/// bootstrap — não é um papel de arquitetura (View/ViewModel/Coordinator)
-/// em si, só o ponto de entrada que os conecta.
+/// Bridge between the SwiftUI world (App/Scene) and the UINavigationController
+/// that AppCoordinator uses to orchestrate the screens. This is bootstrap
+/// infrastructure, not an architecture role (View/ViewModel/Coordinator) in
+/// itself, just the entry point that wires them together.
 private struct RootNavigationView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UINavigationController {
         let navigationController = UINavigationController()

@@ -12,14 +12,14 @@ public protocol FxUseCaseProtocol {
     func fetchRates() async throws -> [FxRate]
 }
 
-/// Busca as taxas de câmbio pra um conjunto fixo de pares de moedas. Cada
-/// par é uma chamada independente (GET /banks/{bank}/fx/{from}/{to}, v2.2.0
-/// — versão diferente do resto do app, confirmada no resource-docs). O
-/// bank_id usado é o mesmo da vitrine de Produtos ("inv.01.uk.uk"), que é
-/// o banco com dados cadastrados nesta sandbox multi-banco — não foi
-/// confirmado se toda sandbox tem taxas cadastradas pra esse bank_id
-/// específico, então um par sem taxa é tratado como ausência normal, não
-/// como erro (mesma postura já usada em Produtos).
+/// Fetches exchange rates for a fixed set of currency pairs. Each pair is an
+/// independent call (GET /banks/{bank}/fx/{from}/{to}, v2.2.0, a different
+/// version from the rest of the app, confirmed in the resource docs). The
+/// bank_id used is the same one from the Products showcase ("inv.01.uk.uk"),
+/// which is the bank with registered data in this multi-bank sandbox. It
+/// hasn't been confirmed whether every sandbox has rates registered for
+/// that specific bank_id, so a pair with no rate is treated as a normal
+/// absence, not an error (the same stance already used in Products).
 public final class FxUseCase: FxUseCaseProtocol {
     private let apiClient: OBPAPIClient
     private let bankId: String

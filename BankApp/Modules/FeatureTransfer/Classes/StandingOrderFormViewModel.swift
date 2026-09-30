@@ -27,11 +27,11 @@ public final class StandingOrderFormViewModel: ObservableObject {
         }
     }
 
-    /// Ainda não existe uma tela de listagem de beneficiários salvos — por
-    /// ora este campo aceita o counterparty_id colado manualmente (ex.: o
-    /// devolvido ao cadastrar um beneficiário). Trocar por um seletor real
-    /// é o próximo passo natural quando a listagem de counterparties for
-    /// implementada.
+    /// There's still no screen listing saved beneficiaries; for now this
+    /// field accepts a manually pasted counterparty_id (e.g. the one
+    /// returned when registering a beneficiary). Swapping this for a real
+    /// picker is the natural next step once the counterparty listing is
+    /// implemented.
     @Published public var counterpartyId: String = ""
     @Published public var amountText: String = ""
     @Published public var frequency: Frequency = .monthly

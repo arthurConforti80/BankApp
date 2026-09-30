@@ -13,12 +13,13 @@ public protocol AccountsUseCaseProtocol {
     func fetchRecentTransactions(for account: Account, limit: Int) async throws -> [Transaction]
 }
 
-/// Busca as contas via Core.OBPAPIClient e mapeia o DTO da API para a
-/// Entity de domínio. O DTO nunca sai daqui — a ViewModel só vê `Account`.
+/// Fetches the accounts via Core.OBPAPIClient and maps the API DTO to the
+/// domain Entity. The DTO never leaves this file, the ViewModel only ever
+/// sees `Account`.
 ///
-/// O extrato (fetchRecentTransactions) delega ao Core.TransactionsService,
-/// compartilhado com FeatureCards — ver comentário em TransactionsService.swift
-/// sobre por que essa lógica vive no Core e não aqui.
+/// The statement (fetchRecentTransactions) delegates to Core.TransactionsService,
+/// shared with FeatureCards. See the comment in TransactionsService.swift
+/// for why that logic lives in Core and not here.
 public final class AccountsUseCase: AccountsUseCaseProtocol {
     private let apiClient: OBPAPIClient
     private let transactionsService: TransactionsServiceProtocol

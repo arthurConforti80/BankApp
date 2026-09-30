@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-/// Bloco "ÚLTIMAS TRANSAÇÕES" reutilizado pelo detalhe de conta e pelo
-/// detalhe de cartão. Vive em Core pelo mesmo motivo do DetailHeader: os
-/// dois feature modules precisam dele e não podem depender um do outro.
+/// "RECENT TRANSACTIONS" block reused by the account detail screen and the
+/// card detail screen. Lives in Core for the same reason as DetailHeader:
+/// both feature modules need it and can't depend on each other.
 public struct TransactionsSection: View {
     private let isLoading: Bool
     private let errorMessage: String?

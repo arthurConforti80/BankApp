@@ -17,8 +17,8 @@ public protocol DirectDebitUseCaseProtocol {
     ) async throws
 }
 
-/// Autoriza uma empresa (counterparty já cadastrado) a debitar
-/// automaticamente da conta. Ver comentário em CreateDirectDebitRequestDTO.
+/// Authorizes a company (an already registered counterparty) to
+/// automatically debit the account. See the comment on CreateDirectDebitRequestDTO.
 public final class DirectDebitUseCase: DirectDebitUseCaseProtocol {
     private let apiClient: OBPAPIClient
     private let dateFormatter: ISO8601DateFormatter = {

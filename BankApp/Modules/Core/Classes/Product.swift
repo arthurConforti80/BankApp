@@ -7,11 +7,11 @@
 
 import Foundation
 
-/// Entity de domínio pra um produto oferecido pelo banco (não é específico
-/// da conta do usuário — é o catálogo do banco, tipo "conta poupança",
-/// "cartão platinum" etc). Vive em Core porque a Home combina Accounts,
-/// Cards e Products na mesma tela, igual já acontecia com Account e
-/// CreditCard.
+/// Domain entity for a product offered by the bank (not specific to the
+/// user's account, it's the bank's catalog, things like "savings account",
+/// "platinum card" etc). Lives in Core because Home combines Accounts,
+/// Cards and Products on the same screen, just like it already did with
+/// Account and CreditCard.
 public struct Product: Identifiable, Equatable {
     public let id: String
     public let name: String

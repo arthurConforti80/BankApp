@@ -21,8 +21,8 @@ public protocol StandingOrderUseCaseProtocol {
     ) async throws
 }
 
-/// Cria um pagamento recorrente (standing order) pra um counterparty já
-/// cadastrado. Ver comentário em CreateStandingOrderRequestDTO.
+/// Creates a recurring payment (standing order) for an already registered
+/// counterparty. See the comment on CreateStandingOrderRequestDTO.
 public final class StandingOrderUseCase: StandingOrderUseCaseProtocol {
     private let apiClient: OBPAPIClient
     private let dateFormatter: ISO8601DateFormatter = {
@@ -35,8 +35,9 @@ public final class StandingOrderUseCase: StandingOrderUseCaseProtocol {
         self.apiClient = apiClient
     }
 
-    /// Sem data final, a OBP ainda exige o campo `date_expires` presente
-    /// no JSON — usamos uma data bem distante em vez de omitir a chave.
+    /// With no end date, OBP still requires the `date_expires` field to be
+    /// present in the JSON, so we use a date far in the future instead of
+    /// omitting the key.
     private static let farFutureExpiry = "2099-12-31T00:00:00Z"
 
     public func createStandingOrder(

@@ -4,6 +4,8 @@ PODS:
     - Core
   - FeatureCards (0.1.0):
     - Core
+  - FeatureCustomer (0.1.0):
+    - Core
   - FeatureFX (0.1.0):
     - Core
   - FeatureLogin (0.1.0):
@@ -17,6 +19,7 @@ DEPENDENCIES:
   - Core (from `Modules/Core`)
   - FeatureAccounts (from `Modules/FeatureAccounts`)
   - FeatureCards (from `Modules/FeatureCards`)
+  - FeatureCustomer (from `Modules/FeatureCustomer`)
   - FeatureFX (from `Modules/FeatureFX`)
   - FeatureLogin (from `Modules/FeatureLogin`)
   - FeatureProducts (from `Modules/FeatureProducts`)
@@ -29,6 +32,8 @@ EXTERNAL SOURCES:
     :path: Modules/FeatureAccounts
   FeatureCards:
     :path: Modules/FeatureCards
+  FeatureCustomer:
+    :path: Modules/FeatureCustomer
   FeatureFX:
     :path: Modules/FeatureFX
   FeatureLogin:
@@ -42,11 +47,12 @@ SPEC CHECKSUMS:
   Core: 1c686407d508bd8e57919cb861fde11d55442dff
   FeatureAccounts: bbd2132e6fdedf4d02c6bd6520877c404cf95fac
   FeatureCards: 6daa72b5143e0022343c40f58f6f1c498f9e0308
+  FeatureCustomer: 62592da23c66c5f7a7a5c9be564d87575248261c
   FeatureFX: ab065366e9aac56b892d456f85824bd22441a274
   FeatureLogin: ec174ad66f8f568a84445ccbeb50108ea8a1e938
   FeatureProducts: 929535581c674c62a53099a51f4816c537f025ea
   FeatureTransfer: 5f68ad6d63182051f34769f70ac052bc05db7de0
 
-PODFILE CHECKSUM: e970adeb174a75c2ee4cb0bbae63fa44eb5e6645
+PODFILE CHECKSUM: 807d2a4c5ae31c80d208ad460960e2e95ee054d2
 
 COCOAPODS: 1.17.0

@@ -18,14 +18,14 @@ struct HomeView: View {
 
     private static let productsSectionID = "produtos-section"
 
-    /// Alturas ilustrativas para o mini-gráfico do hero. A sandbox OBP usada
-    /// neste projeto não expõe um endpoint de saldo histórico — isto é um
-    /// placeholder visual, não dado real, até existir uma fonte pra isso.
+    /// Illustrative heights for the hero mini chart. The OBP sandbox used
+    /// in this project doesn't expose a historical balance endpoint, so this
+    /// is a visual placeholder, not real data, until a source for it exists.
     private let heroBarHeights: [CGFloat] = [0.40, 0.55, 0.35, 0.70, 0.50, 0.85, 0.65]
 
-    /// Categorias de gastos do mês: também ilustrativas. A OBP não devolve
-    /// categorização de transações nesta sandbox, então isto é um mock
-    /// visual até existir um use case real de categorização de extrato.
+    /// Monthly spending categories: also illustrative. The OBP doesn't return
+    /// transaction categorization in this sandbox, so this is a visual mock
+    /// until a real statement categorization use case exists.
     private let spendingCategories: [(name: String, percent: Double, color: SwiftUI.Color)] = [
         ("Shopping", 0.42, BankAppTheme.Color.emerald),
         ("Food", 0.27, BankAppTheme.Color.emerald),
@@ -133,7 +133,7 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Hero (saldo total + mini-gráfico)
+    // MARK: - Hero (total balance + mini chart)
 
     private var heroBalanceCard: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -180,10 +180,10 @@ struct HomeView: View {
         viewModel.accounts.contains { $0.balance != nil }
     }
 
-    /// Soma os saldos conhecidos quando todas as contas com saldo estão na
-    /// mesma moeda; caso contrário (ou sem nenhum saldo conhecido) mostra o
-    /// mesmo texto de indisponibilidade já usado nas linhas de conta, para
-    /// nunca exibir um valor inventado.
+    /// Sums the known balances when all accounts with a balance are in the
+    /// same currency; otherwise (or with no known balance at all) shows the
+    /// same unavailability text already used in the account rows, so it
+    /// never displays a made-up value.
     private var totalBalanceText: String {
         let knownAccounts = viewModel.accounts.compactMap { account -> (Decimal, String)? in
             guard let balance = account.balance, let currency = account.currency else { return nil }
@@ -197,7 +197,7 @@ struct HomeView: View {
         return BankAppTheme.formattedBalance(total, currency: firstCurrency)
     }
 
-    // MARK: - Ações rápidas
+    // MARK: - Quick actions
 
     private func quickActions(scrollProxy: ScrollViewProxy) -> some View {
         HStack {
@@ -217,7 +217,7 @@ struct HomeView: View {
         }
     }
 
-    /// Ícone de referência rápida, sem ação própria.
+    /// Quick-reference icon, with no action of its own.
     private func quickActionIcon(systemImage: String, label: String) -> some View {
         VStack(spacing: 8) {
             ZStack {
@@ -237,8 +237,8 @@ struct HomeView: View {
         .frame(width: 72)
     }
 
-    /// Ícone de ação rápida que dispara uma ação real (hoje só "Produtos",
-    /// que rola até o quadro de Produtos mais abaixo na mesma tela).
+    /// Quick-action icon that triggers a real action (today only "Products",
+    /// which scrolls down to the Products section further down the same screen).
     private func quickActionButton(systemImage: String, label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             quickActionIcon(systemImage: systemImage, label: label)
@@ -246,7 +246,7 @@ struct HomeView: View {
         .buttonStyle(.plain)
     }
 
-    // MARK: - Pagamentos (entrada pro hub de transferência/beneficiário/recorrente/débito)
+    // MARK: - Payments (entry point to the transfer/beneficiary/recurring payment/direct debit hub)
 
     private var paymentsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -293,7 +293,7 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Câmbio
+    // MARK: - Exchange rates
 
     private var fxSection: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -353,7 +353,7 @@ struct HomeView: View {
         return formatter.string(from: NSDecimalNumber(decimal: value)) ?? "\(value)"
     }
 
-    // MARK: - Resumo de gastos
+    // MARK: - Spending summary
 
     private var spendingSummaryCard: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -481,7 +481,7 @@ struct HomeView: View {
         .padding(16)
     }
 
-    // MARK: - Produtos (grid de 3 colunas, ícone + nome)
+    // MARK: - Products (3-column grid, icon + name)
 
     private var productsGrid: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -537,12 +537,12 @@ struct HomeView: View {
         .frame(maxWidth: .infinity)
     }
 
-    /// Escolhe um ícone com base em palavras-chave do nome do produto —
-    /// a API não devolve categoria/tipo do produto, só um nome livre, então
-    /// isso é uma heurística (best-effort), não um mapeamento oficial.
-    /// Todos os ícones usam a mesma cor (ink) e o mesmo box (.resizable +
-    /// .scaledToFit em productCell), pra não variar de tamanho entre
-    /// símbolos SF Symbols diferentes nem destacar um produto sobre outro.
+    /// Picks an icon based on keywords in the product name (the API doesn't
+    /// return a product category/type, just a free-text name, so this is a
+    /// heuristic, best-effort, not an official mapping). All icons use the
+    /// same color (ink) and the same box (.resizable + .scaledToFit in
+    /// productCell), so size doesn't vary between different SF Symbols or
+    /// make one product stand out over another.
     private func iconName(for product: Product) -> String {
         let name = product.name.lowercased()
 

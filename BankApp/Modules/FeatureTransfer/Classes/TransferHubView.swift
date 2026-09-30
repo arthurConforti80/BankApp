@@ -8,10 +8,10 @@
 import SwiftUI
 import Core
 
-/// Tela de escolha entre os quatro tipos de pagamento/transferência. Fica
-/// em FeatureTransfer (não no app target) porque só compõe telas do
-/// próprio módulo — diferente da Home, que precisa combinar módulos
-/// diferentes e por isso vive no target de composição.
+/// Screen for choosing between the four payment/transfer types. Lives in
+/// FeatureTransfer (not in the app target) because it only composes screens
+/// from its own module, unlike Home, which needs to combine different
+/// modules and therefore lives in the composition target.
 public struct TransferHubView: View {
     private let onNewTransfer: () -> Void
     private let onNewCounterparty: () -> Void

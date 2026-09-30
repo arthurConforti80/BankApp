@@ -7,11 +7,11 @@
 
 import Foundation
 
-/// Schema aproximado de GET /cards. A documentação pública lista campos
-/// bem mais extensos (replacement, pin_reset, networks, allows...) — só
-/// declaramos aqui o que realmente usamos, e tudo opcional, seguindo a
-/// mesma lição aprendida com AccountDTO: confirmar contra o API Explorer
-/// antes de depender disso em produção.
+/// Approximate schema for GET /cards. The public documentation lists much
+/// more extensive fields (replacement, pin_reset, networks, allows...); we
+/// only declare here what we actually use, all optional, following the same
+/// lesson learned with AccountDTO: confirm against the API Explorer before
+/// depending on this in production.
 struct CardsResponseDTO: Decodable {
     let cards: [CardDTO]
 }

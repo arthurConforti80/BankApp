@@ -7,11 +7,10 @@
 
 import SwiftUI
 
-/// Cabeçalho minimalista das telas de detalhe (conta / cartão), reproduzindo
-/// o mockup: botão de voltar circular + título, sem a barra de navegação
-/// padrão do sistema. Vive em Core porque tanto FeatureAccounts quanto
-/// FeatureCards precisam dele, e nenhum feature module pode depender do
-/// outro.
+/// Minimal header for the detail screens (account / card), mirroring the
+/// mockup: circular back button + title, without the system's standard
+/// navigation bar. Lives in Core because both FeatureAccounts and
+/// FeatureCards need it, and no feature module can depend on another.
 public struct DetailHeader: View {
     private let title: String
     private let onBack: () -> Void

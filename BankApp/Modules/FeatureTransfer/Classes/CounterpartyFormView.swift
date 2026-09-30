@@ -137,9 +137,9 @@ public struct CounterpartyFormView: View {
         .padding(24)
     }
 
-    /// Enquanto não existe uma tela de listagem de beneficiários, exibe
-    /// o ID recém-criado pra ser copiado e colado nos formulários de
-    /// pagamento recorrente e débito automático.
+    /// While there's no beneficiary listing screen yet, shows the
+    /// newly created ID to be copied and pasted into the recurring payment
+    /// and direct debit forms.
     @ViewBuilder
     private func counterpartyIdCard(_ counterpartyId: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
