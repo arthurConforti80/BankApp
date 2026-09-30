@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-/// Paleta e tipografia compartilhadas entre os módulos de UI do BankApp,
-/// espelhando o mockup de design (Login / Home / Detalhe). Vive em Core
-/// porque FeatureLogin, FeatureAccounts e FeatureCards precisam dela, e
-/// nenhum feature module pode depender de outro.
+/// Palette and typography shared between BankApp's UI modules, mirroring
+/// the design mockup (Login / Home / Detail). Lives in Core because
+/// FeatureLogin, FeatureAccounts and FeatureCards need it, and no feature
+/// module can depend on another.
 ///
-/// As fontes de exibição usam o design `.serif` do sistema como stand-in
-/// para a Fraunces do mockup, e o design `.default` como stand-in para a
-/// Public Sans — assim não é preciso embutir arquivos de fonte no app.
+/// The display fonts use the system's `.serif` design as a stand-in for the
+/// mockup's Fraunces, and the `.default` design as a stand-in for Public
+/// Sans, so there's no need to embed font files in the app.
 public enum BankAppTheme {
     public enum Color {
         public static let ink = SwiftUI.Color(red: 0x16 / 255, green: 0x23 / 255, blue: 0x1F / 255)
@@ -27,15 +27,15 @@ public enum BankAppTheme {
         public static let positive = emerald
         public static let negative = SwiftUI.Color(red: 0x9B / 255, green: 0x2E / 255, blue: 0x2E / 255)
 
-        /// Tons usados sobre o fundo ink (hero da Home, painel do Login):
-        /// uma variação mais clara do ink para elementos decorativos (barras
-        /// do mini-gráfico) e um cinza-verde claro para texto secundário
-        /// que precisa de contraste sobre `ink`, já que `mutedText` não tem
-        /// contraste suficiente ali.
+        /// Tones used over the ink background (Home hero, Login panel): a
+        /// lighter variation of ink for decorative elements (mini chart
+        /// bars) and a light gray-green for secondary text that needs
+        /// contrast over `ink`, since `mutedText` doesn't have enough
+        /// contrast there.
         public static let barMuted = SwiftUI.Color(red: 0x3A / 255, green: 0x4A / 255, blue: 0x44 / 255)
         public static let mutedOnInk = SwiftUI.Color(red: 0xB8 / 255, green: 0xBD / 255, blue: 0xB6 / 255)
 
-        /// Trilho de fundo das barras de progresso (resumo de gastos).
+        /// Background track for the progress bars (spending summary).
         public static let trackFill = SwiftUI.Color(red: 0xEF / 255, green: 0xEA / 255, blue: 0xDA / 255)
     }
 
@@ -49,15 +49,15 @@ public enum BankAppTheme {
         }
     }
 
-    /// Formata um valor com sinal (+/-) para linhas de extrato, no padrão
-    /// pt-PT (vírgula decimal) usado no mockup: "-42,30 EUR" / "+350,00 EUR".
+    /// Formats a signed value (+/-) for statement lines, in the pt-PT
+    /// format (decimal comma) used in the mockup: "-42,30 EUR" / "+350,00 EUR".
     public static func formattedSignedAmount(_ amount: Decimal, currency: String) -> String {
         let formatted = decimalFormatter.string(from: NSDecimalNumber(decimal: abs(amount))) ?? "\(abs(amount))"
         let sign = amount < 0 ? "-" : (amount > 0 ? "+" : "")
         return "\(sign)\(formatted) \(currency)"
     }
 
-    /// Formata um saldo sem sinal, mesmo padrão pt-PT.
+    /// Formats a balance with no sign, same pt-PT format.
     public static func formattedBalance(_ amount: Decimal, currency: String) -> String {
         let formatted = decimalFormatter.string(from: NSDecimalNumber(decimal: amount)) ?? "\(amount)"
         return "\(formatted) \(currency)"

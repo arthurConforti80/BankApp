@@ -14,22 +14,23 @@ struct HomeView: View {
     let onSelectAccount: (Account) -> Void
     let onSelectCard: (CreditCard) -> Void
     let onSelectPayments: () -> Void
+    let onSelectProfile: () -> Void
 
     private static let productsSectionID = "produtos-section"
 
-    /// Alturas ilustrativas para o mini-gráfico do hero. A sandbox OBP usada
-    /// neste projeto não expõe um endpoint de saldo histórico — isto é um
-    /// placeholder visual, não dado real, até existir uma fonte pra isso.
+    /// Illustrative heights for the hero mini chart. The OBP sandbox used
+    /// in this project doesn't expose a historical balance endpoint, so this
+    /// is a visual placeholder, not real data, until a source for it exists.
     private let heroBarHeights: [CGFloat] = [0.40, 0.55, 0.35, 0.70, 0.50, 0.85, 0.65]
 
-    /// Categorias de gastos do mês: também ilustrativas. A OBP não devolve
-    /// categorização de transações nesta sandbox, então isto é um mock
-    /// visual até existir um use case real de categorização de extrato.
+    /// Monthly spending categories: also illustrative. The OBP doesn't return
+    /// transaction categorization in this sandbox, so this is a visual mock
+    /// until a real statement categorization use case exists.
     private let spendingCategories: [(name: String, percent: Double, color: SwiftUI.Color)] = [
-        ("Compras", 0.42, BankAppTheme.Color.emerald),
-        ("Alimentação", 0.27, BankAppTheme.Color.emerald),
-        ("Transporte", 0.18, BankAppTheme.Color.gold),
-        ("Outros", 0.13, BankAppTheme.Color.gold)
+        ("Shopping", 0.42, BankAppTheme.Color.emerald),
+        ("Food", 0.27, BankAppTheme.Color.emerald),
+        ("Transport", 0.18, BankAppTheme.Color.gold),
+        ("Other", 0.13, BankAppTheme.Color.gold)
     ]
 
     var body: some View {
@@ -38,7 +39,7 @@ struct HomeView: View {
 
             Group {
                 if viewModel.isLoading {
-                    ProgressView("Carregando...")
+                    ProgressView("Loading...")
                 } else if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .foregroundStyle(BankAppTheme.Color.negative)
@@ -53,9 +54,9 @@ struct HomeView: View {
                                 fxSection
 
                                 sectionList(
-                                    title: "Contas",
+                                    title: "Accounts",
                                     isEmpty: viewModel.accounts.isEmpty,
-                                    emptyText: "Nenhuma conta encontrada."
+                                    emptyText: "No accounts found."
                                 ) {
                                     ForEach(Array(viewModel.accounts.enumerated()), id: \.element.id) { index, account in
                                         if index > 0 {
@@ -71,9 +72,9 @@ struct HomeView: View {
                                 }
 
                                 sectionList(
-                                    title: "Cartões",
+                                    title: "Cards",
                                     isEmpty: viewModel.cards.isEmpty,
-                                    emptyText: "Nenhum cartão encontrado."
+                                    emptyText: "No cards found."
                                 ) {
                                     ForEach(Array(viewModel.cards.enumerated()), id: \.element.id) { index, card in
                                         if index > 0 {
@@ -108,7 +109,7 @@ struct HomeView: View {
     private var header: some View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Olá,")
+                Text("Hi,")
                     .font(BankAppTheme.Typography.body(14))
                     .foregroundStyle(BankAppTheme.Color.mutedText)
                 Text(viewModel.displayName)
@@ -118,23 +119,27 @@ struct HomeView: View {
 
             Spacer()
 
-            ZStack {
-                Circle().fill(BankAppTheme.Color.emerald)
-                Text(viewModel.initials)
-                    .font(BankAppTheme.Typography.body(14, weight: .semibold))
-                    .foregroundStyle(BankAppTheme.Color.cream)
+            Button(action: onSelectProfile) {
+                ZStack {
+                    Circle().fill(BankAppTheme.Color.emerald)
+                    Text(viewModel.initials)
+                        .font(BankAppTheme.Typography.body(14, weight: .semibold))
+                        .foregroundStyle(BankAppTheme.Color.cream)
+                }
+                .frame(width: 44, height: 44)
             }
-            .frame(width: 44, height: 44)
+            .buttonStyle(.plain)
+            .accessibilityLabel("Profile")
         }
     }
 
-    // MARK: - Hero (saldo total + mini-gráfico)
+    // MARK: - Hero (total balance + mini chart)
 
     private var heroBalanceCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Saldo total")
+                    Text("Total balance")
                         .font(BankAppTheme.Typography.body(12))
                         .foregroundStyle(BankAppTheme.Color.mutedOnInk)
                     Text(totalBalanceText)
@@ -145,7 +150,7 @@ struct HomeView: View {
                 Spacer()
 
                 if hasKnownBalance {
-                    Text("+3,2%")
+                    Text("+3.2%")
                         .font(BankAppTheme.Typography.body(11, weight: .semibold))
                         .foregroundStyle(BankAppTheme.Color.ink)
                         .padding(.horizontal, 10)
@@ -163,7 +168,7 @@ struct HomeView: View {
             }
             .frame(height: 40, alignment: .bottom)
 
-            Text("Últimos 7 dias")
+            Text("Last 7 days")
                 .font(BankAppTheme.Typography.body(11))
                 .foregroundStyle(BankAppTheme.Color.mutedOnInk)
         }
@@ -175,10 +180,10 @@ struct HomeView: View {
         viewModel.accounts.contains { $0.balance != nil }
     }
 
-    /// Soma os saldos conhecidos quando todas as contas com saldo estão na
-    /// mesma moeda; caso contrário (ou sem nenhum saldo conhecido) mostra o
-    /// mesmo texto de indisponibilidade já usado nas linhas de conta, para
-    /// nunca exibir um valor inventado.
+    /// Sums the known balances when all accounts with a balance are in the
+    /// same currency; otherwise (or with no known balance at all) shows the
+    /// same unavailability text already used in the account rows, so it
+    /// never displays a made-up value.
     private var totalBalanceText: String {
         let knownAccounts = viewModel.accounts.compactMap { account -> (Decimal, String)? in
             guard let balance = account.balance, let currency = account.currency else { return nil }
@@ -186,33 +191,33 @@ struct HomeView: View {
         }
         guard let firstCurrency = knownAccounts.first?.1,
               knownAccounts.allSatisfy({ $0.1 == firstCurrency }) else {
-            return "Saldo indisponível"
+            return "Balance unavailable"
         }
         let total = knownAccounts.reduce(Decimal(0)) { $0 + $1.0 }
         return BankAppTheme.formattedBalance(total, currency: firstCurrency)
     }
 
-    // MARK: - Ações rápidas
+    // MARK: - Quick actions
 
     private func quickActions(scrollProxy: ScrollViewProxy) -> some View {
         HStack {
-            quickActionButton(systemImage: "arrow.up.right", label: "Transferir") {
+            quickActionButton(systemImage: "arrow.up.right", label: "Transfer") {
                 onSelectPayments()
             }
             Spacer()
-            quickActionIcon(systemImage: "creditcard", label: "Cartões")
+            quickActionIcon(systemImage: "creditcard", label: "Cards")
             Spacer()
-            quickActionButton(systemImage: "square.grid.2x2", label: "Produtos") {
+            quickActionButton(systemImage: "square.grid.2x2", label: "Products") {
                 withAnimation {
                     scrollProxy.scrollTo(Self.productsSectionID, anchor: .top)
                 }
             }
             Spacer()
-            quickActionIcon(systemImage: "list.bullet", label: "Extrato")
+            quickActionIcon(systemImage: "list.bullet", label: "Statement")
         }
     }
 
-    /// Ícone de referência rápida, sem ação própria.
+    /// Quick-reference icon, with no action of its own.
     private func quickActionIcon(systemImage: String, label: String) -> some View {
         VStack(spacing: 8) {
             ZStack {
@@ -232,8 +237,8 @@ struct HomeView: View {
         .frame(width: 72)
     }
 
-    /// Ícone de ação rápida que dispara uma ação real (hoje só "Produtos",
-    /// que rola até o quadro de Produtos mais abaixo na mesma tela).
+    /// Quick-action icon that triggers a real action (today only "Products",
+    /// which scrolls down to the Products section further down the same screen).
     private func quickActionButton(systemImage: String, label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             quickActionIcon(systemImage: systemImage, label: label)
@@ -241,11 +246,11 @@ struct HomeView: View {
         .buttonStyle(.plain)
     }
 
-    // MARK: - Pagamentos (entrada pro hub de transferência/beneficiário/recorrente/débito)
+    // MARK: - Payments (entry point to the transfer/beneficiary/recurring payment/direct debit hub)
 
     private var paymentsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Pagamentos".uppercased())
+            Text("Payments".uppercased())
                 .font(BankAppTheme.Typography.body(12, weight: .semibold))
                 .tracking(0.5)
                 .foregroundStyle(BankAppTheme.Color.mutedText)
@@ -261,10 +266,10 @@ struct HomeView: View {
                     .frame(width: 40, height: 40)
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Transferência")
+                        Text("Transfer")
                             .font(BankAppTheme.Typography.body(15, weight: .semibold))
                             .foregroundStyle(BankAppTheme.Color.ink)
-                        Text("Nova, beneficiário, recorrente ou débito automático")
+                        Text("New, beneficiary, recurring payment or direct debit")
                             .font(BankAppTheme.Typography.body(12))
                             .foregroundStyle(BankAppTheme.Color.mutedText)
                     }
@@ -288,17 +293,17 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Câmbio
+    // MARK: - Exchange rates
 
     private var fxSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Câmbio".uppercased())
+            Text("Exchange rates".uppercased())
                 .font(BankAppTheme.Typography.body(12, weight: .semibold))
                 .tracking(0.5)
                 .foregroundStyle(BankAppTheme.Color.mutedText)
 
             if viewModel.fxRates.isEmpty {
-                Text("Taxas indisponíveis no momento.")
+                Text("Rates unavailable right now.")
                     .font(BankAppTheme.Typography.body(14))
                     .foregroundStyle(BankAppTheme.Color.mutedText)
             } else {
@@ -341,19 +346,19 @@ struct HomeView: View {
 
     private func formattedRate(_ value: Decimal) -> String {
         let formatter = NumberFormatter()
-        formatter.locale = Locale(identifier: "pt_PT")
+        formatter.locale = Locale(identifier: "en_US")
         formatter.numberStyle = .decimal
         formatter.minimumFractionDigits = 4
         formatter.maximumFractionDigits = 4
         return formatter.string(from: NSDecimalNumber(decimal: value)) ?? "\(value)"
     }
 
-    // MARK: - Resumo de gastos
+    // MARK: - Spending summary
 
     private var spendingSummaryCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Gastos do mês".uppercased())
+                Text("Monthly spending".uppercased())
                     .font(BankAppTheme.Typography.body(12, weight: .semibold))
                     .tracking(0.5)
                     .foregroundStyle(BankAppTheme.Color.mutedText)
@@ -399,7 +404,7 @@ struct HomeView: View {
 
     private var currentMonthName: String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "pt_PT")
+        formatter.locale = Locale(identifier: "en_US")
         formatter.dateFormat = "LLLL"
         return formatter.string(from: Date()).capitalized
     }
@@ -476,17 +481,17 @@ struct HomeView: View {
         .padding(16)
     }
 
-    // MARK: - Produtos (grid de 3 colunas, ícone + nome)
+    // MARK: - Products (3-column grid, icon + name)
 
     private var productsGrid: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Produtos".uppercased())
+            Text("Products".uppercased())
                 .font(BankAppTheme.Typography.body(12, weight: .semibold))
                 .tracking(0.5)
                 .foregroundStyle(BankAppTheme.Color.mutedText)
 
             if viewModel.products.isEmpty {
-                Text("Não tem produtos relacionados a sua conta")
+                Text("No products linked to your account")
                     .font(BankAppTheme.Typography.body(14))
                     .foregroundStyle(BankAppTheme.Color.mutedText)
             } else {
@@ -532,12 +537,12 @@ struct HomeView: View {
         .frame(maxWidth: .infinity)
     }
 
-    /// Escolhe um ícone com base em palavras-chave do nome do produto —
-    /// a API não devolve categoria/tipo do produto, só um nome livre, então
-    /// isso é uma heurística (best-effort), não um mapeamento oficial.
-    /// Todos os ícones usam a mesma cor (ink) e o mesmo box (.resizable +
-    /// .scaledToFit em productCell), pra não variar de tamanho entre
-    /// símbolos SF Symbols diferentes nem destacar um produto sobre outro.
+    /// Picks an icon based on keywords in the product name (the API doesn't
+    /// return a product category/type, just a free-text name, so this is a
+    /// heuristic, best-effort, not an official mapping). All icons use the
+    /// same color (ink) and the same box (.resizable + .scaledToFit in
+    /// productCell), so size doesn't vary between different SF Symbols or
+    /// make one product stand out over another.
     private func iconName(for product: Product) -> String {
         let name = product.name.lowercased()
 
@@ -562,7 +567,7 @@ struct HomeView: View {
 
     private func balanceText(for account: Account) -> String {
         guard let balance = account.balance, let currency = account.currency else {
-            return "Saldo indisponível"
+            return "Balance unavailable"
         }
         return BankAppTheme.formattedBalance(balance, currency: currency)
     }

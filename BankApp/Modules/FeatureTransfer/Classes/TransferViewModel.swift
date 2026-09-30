@@ -41,13 +41,13 @@ public final class TransferViewModel: ObservableObject {
         errorMessage = nil
 
         guard !destinationIBAN.trimmingCharacters(in: .whitespaces).isEmpty else {
-            errorMessage = "Informe o IBAN do beneficiário."
+            errorMessage = "Enter the beneficiary's IBAN."
             return
         }
 
         let normalizedAmount = amountText.replacingOccurrences(of: ",", with: ".")
         guard let amount = Decimal(string: normalizedAmount), amount > 0 else {
-            errorMessage = "Informe um valor válido."
+            errorMessage = "Enter a valid amount."
             return
         }
 
@@ -60,7 +60,7 @@ public final class TransferViewModel: ObservableObject {
                     destinationIBAN: destinationIBAN,
                     amount: amount,
                     currency: fromAccount.currency ?? "EUR",
-                    description: note.isEmpty ? "Transferência BankApp" : note
+                    description: note.isEmpty ? "BankApp transfer" : note
                 )
                 isSubmitting = false
 
@@ -74,7 +74,7 @@ public final class TransferViewModel: ObservableObject {
                 }
             } catch {
                 isSubmitting = false
-                errorMessage = "Não foi possível concluir a transferência."
+                errorMessage = "Couldn't complete the transfer."
             }
         }
     }
@@ -83,11 +83,11 @@ public final class TransferViewModel: ObservableObject {
         errorMessage = nil
 
         guard !code.trimmingCharacters(in: .whitespaces).isEmpty else {
-            errorMessage = "Informe o código de verificação."
+            errorMessage = "Enter the verification code."
             return
         }
         guard let transactionRequestId = pendingTransactionRequestId, let challengeId = pendingChallengeId else {
-            errorMessage = "Sessão de confirmação expirada, tente novamente."
+            errorMessage = "Confirmation session expired, please try again."
             step = .form
             return
         }
@@ -106,7 +106,7 @@ public final class TransferViewModel: ObservableObject {
                 step = .success
             } catch {
                 isSubmitting = false
-                errorMessage = "Código inválido ou expirado."
+                errorMessage = "Invalid or expired code."
             }
         }
     }

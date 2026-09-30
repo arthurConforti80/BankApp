@@ -32,11 +32,11 @@ public final class CounterpartyFormViewModel: ObservableObject {
         errorMessage = nil
 
         guard !name.trimmingCharacters(in: .whitespaces).isEmpty else {
-            errorMessage = "Informe o nome do beneficiário."
+            errorMessage = "Enter the beneficiary's name."
             return
         }
         guard !iban.trimmingCharacters(in: .whitespaces).isEmpty else {
-            errorMessage = "Informe o IBAN."
+            errorMessage = "Enter the IBAN."
             return
         }
 
@@ -56,7 +56,7 @@ public final class CounterpartyFormViewModel: ObservableObject {
                 isSaved = true
             } catch {
                 isSubmitting = false
-                errorMessage = "Não foi possível salvar o beneficiário."
+                errorMessage = "Couldn't save the beneficiary."
             }
         }
     }

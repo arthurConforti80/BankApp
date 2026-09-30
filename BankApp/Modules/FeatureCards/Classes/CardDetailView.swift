@@ -22,7 +22,7 @@ public struct CardDetailView: View {
             BankAppTheme.Color.cream.ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 0) {
-                DetailHeader(title: "Cartão", onBack: onBack)
+                DetailHeader(title: "Card", onBack: onBack)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 28) {

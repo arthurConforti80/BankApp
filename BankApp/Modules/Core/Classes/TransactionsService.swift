@@ -7,11 +7,11 @@
 
 import Foundation
 
-/// Busca as últimas transações de uma conta. Vive no Core porque tanto
-/// FeatureAccounts (extrato da própria conta) quanto FeatureCards (extrato
-/// da conta vinculada ao cartão) precisam disso — colocar em qualquer um
-/// dos dois feature modules forçaria o outro a importá-lo diretamente,
-/// violando a regra de fronteira entre módulos de feature.
+/// Fetches an account's most recent transactions. Lives in Core because
+/// both FeatureAccounts (the account's own statement) and FeatureCards (the
+/// statement of the account linked to the card) need this. Putting it in
+/// either feature module would force the other to import it directly,
+/// violating the boundary rule between feature modules.
 public protocol TransactionsServiceProtocol {
     func fetchRecentTransactions(bankId: String, accountId: String, limit: Int) async throws -> [Transaction]
 }
@@ -27,14 +27,15 @@ public final class TransactionsService: TransactionsServiceProtocol {
         let response: TransactionsResponseDTO = try await apiClient.get(
             path: "/my/banks/\(bankId)/accounts/\(accountId)/transactions"
         )
-        // Truncamos no cliente em vez de confiar num parâmetro de query da
-        // API (ex: ?limit=5) — não confirmamos o nome exato desse parâmetro
-        // contra o API Explorer, e truncar aqui garante o "5 primeiros
-        // itens" independente do que o servidor suportar.
+        // We truncate on the client instead of relying on an API query
+        // parameter (e.g. ?limit=5). We haven't confirmed the exact name of
+        // that parameter against the API Explorer, and truncating here
+        // guarantees the "first 5 items" regardless of what the server
+        // supports.
         return response.transactions.prefix(limit).map { dto in
             Transaction(
                 id: dto.id,
-                description: dto.details?.description ?? "Transação",
+                description: dto.details?.description ?? "Transaction",
                 amount: Decimal(string: dto.details?.value?.amount ?? "") ?? 0,
                 currency: dto.details?.value?.currency ?? "",
                 completedDate: dto.details?.completed
@@ -43,10 +44,10 @@ public final class TransactionsService: TransactionsServiceProtocol {
     }
 }
 
-/// Schema aproximado de GET /my/banks/{BANK_ID}/accounts/{ACCOUNT_ID}/transactions.
-/// Assim como aconteceu com AccountDTO, é bem possível que isto precise de
-/// ajuste contra a resposta real — por isso todos os campos abaixo de
-/// TransactionDetailsDTO são opcionais, com fallback no mapeamento acima.
+/// Approximate schema for GET /my/banks/{BANK_ID}/accounts/{ACCOUNT_ID}/transactions.
+/// Just like what happened with AccountDTO, it's quite possible this will
+/// need adjusting against the real response, which is why every field under
+/// TransactionDetailsDTO is optional, with a fallback in the mapping above.
 struct TransactionsResponseDTO: Decodable {
     let transactions: [TransactionDTO]
 }

@@ -9,9 +9,9 @@ import Foundation
 import Core
 
 public protocol CounterpartyUseCaseProtocol {
-    /// Retorna o `counterparty_id` criado, pra ser reaproveitado nos
-    /// formulários de pagamento recorrente e débito automático (ainda
-    /// sem uma tela de listagem de beneficiários).
+    /// Returns the created `counterparty_id`, to be reused in the
+    /// recurring payment and direct debit forms (there's still no
+    /// beneficiary listing screen).
     @discardableResult
     func createCounterparty(
         for account: Account,
@@ -22,9 +22,9 @@ public protocol CounterpartyUseCaseProtocol {
     ) async throws -> String
 }
 
-/// Registra um beneficiário (counterparty) por IBAN pra uma conta. Ver
-/// comentário em CreateCounterpartyRequestDTO sobre o schema ainda não
-/// confirmado contra a sandbox real.
+/// Registers a beneficiary (counterparty) by IBAN for an account. See the
+/// comment on CreateCounterpartyRequestDTO about the schema not yet
+/// confirmed against the real sandbox.
 public final class CounterpartyUseCase: CounterpartyUseCaseProtocol {
     private let apiClient: OBPAPIClient
 

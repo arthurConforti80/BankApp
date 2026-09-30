@@ -22,7 +22,7 @@ public struct StandingOrderFormView: View {
             BankAppTheme.Color.cream.ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 0) {
-                DetailHeader(title: "Pagamento recorrente", onBack: onBack)
+                DetailHeader(title: "Recurring payment", onBack: onBack)
 
                 if viewModel.isSaved {
                     successView
@@ -38,18 +38,18 @@ public struct StandingOrderFormView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Agende um pagamento")
+                    Text("Schedule a payment")
                         .font(BankAppTheme.Typography.display(20, weight: .semibold))
                         .foregroundStyle(BankAppTheme.Color.ink)
-                    Text("Ex.: \"pagar aluguel todo dia 5\"")
+                    Text("E.g.: \"pay rent every 5th\"")
                         .font(BankAppTheme.Typography.body(14))
                         .foregroundStyle(BankAppTheme.Color.mutedText)
                 }
 
-                underlinedField(label: "ID do beneficiário (counterparty_id)", placeholder: "Colar o ID de um beneficiário salvo", text: $viewModel.counterpartyId)
+                underlinedField(label: "Beneficiary ID (counterparty_id)", placeholder: "Paste a saved beneficiary's ID", text: $viewModel.counterpartyId)
 
                 HStack(alignment: .lastTextBaseline, spacing: 8) {
-                    TextField("0,00", text: $viewModel.amountText)
+                    TextField("0.00", text: $viewModel.amountText)
                         .keyboardType(.decimalPad)
                         .font(BankAppTheme.Typography.display(28, weight: .semibold))
                         .foregroundStyle(BankAppTheme.Color.ink)
@@ -63,7 +63,7 @@ public struct StandingOrderFormView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Frequência")
+                    Text("Frequency")
                         .font(BankAppTheme.Typography.body(12))
                         .foregroundStyle(BankAppTheme.Color.mutedText)
 
@@ -75,11 +75,11 @@ public struct StandingOrderFormView: View {
                 }
 
                 HStack(spacing: 14) {
-                    underlinedField(label: "Dia do mês", placeholder: "5", text: $viewModel.dayOfMonth)
+                    underlinedField(label: "Day of month", placeholder: "5", text: $viewModel.dayOfMonth)
                         .frame(maxWidth: .infinity)
 
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Início")
+                        Text("Start date")
                             .font(BankAppTheme.Typography.body(12))
                             .foregroundStyle(BankAppTheme.Color.mutedText)
                         DatePicker("", selection: $viewModel.startDate, displayedComponents: .date)
@@ -90,12 +90,12 @@ public struct StandingOrderFormView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Toggle("Definir data final", isOn: $viewModel.hasEndDate)
+                    Toggle("Set end date", isOn: $viewModel.hasEndDate)
                         .font(BankAppTheme.Typography.body(14))
                         .tint(BankAppTheme.Color.emerald)
 
                     if viewModel.hasEndDate {
-                        DatePicker("Data final", selection: $viewModel.endDate, displayedComponents: .date)
+                        DatePicker("End date", selection: $viewModel.endDate, displayedComponents: .date)
                             .font(BankAppTheme.Typography.body(14))
                             .tint(BankAppTheme.Color.ink)
                     }
@@ -114,7 +114,7 @@ public struct StandingOrderFormView: View {
                         if viewModel.isSubmitting {
                             ProgressView().tint(BankAppTheme.Color.cream)
                         } else {
-                            Text("Agendar pagamento")
+                            Text("Schedule payment")
                                 .font(BankAppTheme.Typography.body(16, weight: .semibold))
                         }
                     }
@@ -178,18 +178,18 @@ public struct StandingOrderFormView: View {
             }
             .frame(width: 64, height: 64)
 
-            Text("Pagamento agendado")
+            Text("Payment scheduled")
                 .font(BankAppTheme.Typography.display(20, weight: .semibold))
                 .foregroundStyle(BankAppTheme.Color.ink)
 
-            Text("Vamos repetir esse pagamento automaticamente, na frequência escolhida, até você cancelar.")
+            Text("We'll repeat this payment automatically, at the chosen frequency, until you cancel it.")
                 .font(BankAppTheme.Typography.body(14))
                 .foregroundStyle(BankAppTheme.Color.mutedText)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 280)
 
             Button(action: onBack) {
-                Text("Voltar aos pagamentos")
+                Text("Back to payments")
                     .font(BankAppTheme.Typography.body(16, weight: .semibold))
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)

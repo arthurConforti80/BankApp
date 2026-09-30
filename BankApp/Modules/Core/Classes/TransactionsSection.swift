@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-/// Bloco "ÚLTIMAS TRANSAÇÕES" reutilizado pelo detalhe de conta e pelo
-/// detalhe de cartão. Vive em Core pelo mesmo motivo do DetailHeader: os
-/// dois feature modules precisam dele e não podem depender um do outro.
+/// "RECENT TRANSACTIONS" block reused by the account detail screen and the
+/// card detail screen. Lives in Core for the same reason as DetailHeader:
+/// both feature modules need it and can't depend on each other.
 public struct TransactionsSection: View {
     private let isLoading: Bool
     private let errorMessage: String?
@@ -23,7 +23,7 @@ public struct TransactionsSection: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Últimas transações".uppercased())
+            Text("Recent transactions".uppercased())
                 .font(BankAppTheme.Typography.body(12, weight: .semibold))
                 .tracking(0.5)
                 .foregroundStyle(BankAppTheme.Color.mutedText)
@@ -36,7 +36,7 @@ public struct TransactionsSection: View {
                     .font(BankAppTheme.Typography.body(14))
                     .foregroundStyle(BankAppTheme.Color.negative)
             } else if transactions.isEmpty {
-                Text("Nenhuma transação encontrada.")
+                Text("No transactions found.")
                     .font(BankAppTheme.Typography.body(14))
                     .foregroundStyle(BankAppTheme.Color.mutedText)
             } else {

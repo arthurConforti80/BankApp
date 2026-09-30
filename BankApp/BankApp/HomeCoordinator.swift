@@ -13,7 +13,9 @@ import FeatureCards
 import FeatureProducts
 import FeatureFX
 import FeatureTransfer
+import FeatureCustomer
 
+@MainActor
 final class HomeCoordinator: Coordinator {
     private let navigationController: UINavigationController
     private let username: String
@@ -23,7 +25,7 @@ final class HomeCoordinator: Coordinator {
         self.username = username
     }
 
-    @MainActor func start() {
+    func start() {
         let viewModel = HomeViewModel(
             username: username,
             accountsUseCase: AccountsUseCase(),
@@ -38,13 +40,17 @@ final class HomeCoordinator: Coordinator {
             onSelectPayments: { [weak self, weak viewModel] in
                 guard let account = viewModel?.accounts.first else { return }
                 self?.showPaymentsHub(from: account)
+            },
+            onSelectProfile: { [weak self, weak viewModel] in
+                guard let bankId = viewModel?.accounts.first?.bankId else { return }
+                self?.showProfile(bankId: bankId)
             }
         )
         let hostingController = UIHostingController(rootView: homeView)
         navigationController.pushViewController(hostingController, animated: true)
     }
 
-    @MainActor private func showAccountDetail(_ account: Account) {
+    private func showAccountDetail(_ account: Account) {
         let viewModel = AccountDetailViewModel(account: account, accountsUseCase: AccountsUseCase())
         let view = AccountDetailView(viewModel: viewModel) { [weak self] in
             self?.navigationController.popViewController(animated: true)
@@ -52,7 +58,7 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(UIHostingController(rootView: view), animated: true)
     }
 
-    @MainActor private func showCardDetail(_ card: CreditCard) {
+    private func showCardDetail(_ card: CreditCard) {
         let viewModel = CardDetailViewModel(card: card, cardsUseCase: CardsUseCase())
         let view = CardDetailView(viewModel: viewModel) { [weak self] in
             self?.navigationController.popViewController(animated: true)
@@ -60,9 +66,9 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(UIHostingController(rootView: view), animated: true)
     }
 
-    // MARK: - Pagamentos
+    // MARK: - Payments
 
-    @MainActor private func showPaymentsHub(from account: Account) {
+    private func showPaymentsHub(from account: Account) {
         let view = TransferHubView(
             onNewTransfer: { [weak self] in self?.showTransfer(from: account) },
             onNewCounterparty: { [weak self] in self?.showCounterpartyForm(from: account) },
@@ -73,7 +79,7 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(UIHostingController(rootView: view), animated: true)
     }
 
-    @MainActor private func showTransfer(from account: Account) {
+    private func showTransfer(from account: Account) {
         let viewModel = TransferViewModel(fromAccount: account, transferUseCase: TransferUseCase())
         let view = TransferView(viewModel: viewModel) { [weak self] in
             self?.navigationController.popViewController(animated: true)
@@ -81,7 +87,7 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(UIHostingController(rootView: view), animated: true)
     }
 
-    @MainActor private func showCounterpartyForm(from account: Account) {
+    private func showCounterpartyForm(from account: Account) {
         let viewModel = CounterpartyFormViewModel(account: account, useCase: CounterpartyUseCase())
         let view = CounterpartyFormView(viewModel: viewModel) { [weak self] in
             self?.navigationController.popViewController(animated: true)
@@ -89,7 +95,7 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(UIHostingController(rootView: view), animated: true)
     }
 
-    @MainActor private func showStandingOrderForm(from account: Account) {
+    private func showStandingOrderForm(from account: Account) {
         let viewModel = StandingOrderFormViewModel(account: account, useCase: StandingOrderUseCase())
         let view = StandingOrderFormView(viewModel: viewModel) { [weak self] in
             self?.navigationController.popViewController(animated: true)
@@ -97,9 +103,19 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(UIHostingController(rootView: view), animated: true)
     }
 
-    @MainActor private func showDirectDebitForm(from account: Account) {
+    private func showDirectDebitForm(from account: Account) {
         let viewModel = DirectDebitFormViewModel(account: account, useCase: DirectDebitUseCase())
         let view = DirectDebitFormView(viewModel: viewModel) { [weak self] in
+            self?.navigationController.popViewController(animated: true)
+        }
+        navigationController.pushViewController(UIHostingController(rootView: view), animated: true)
+    }
+
+    // MARK: - Profile
+
+    private func showProfile(bankId: String) {
+        let viewModel = CustomerViewModel(bankId: bankId, useCase: CustomerUseCase())
+        let view = CustomerView(viewModel: viewModel) { [weak self] in
             self?.navigationController.popViewController(animated: true)
         }
         navigationController.pushViewController(UIHostingController(rootView: view), animated: true)

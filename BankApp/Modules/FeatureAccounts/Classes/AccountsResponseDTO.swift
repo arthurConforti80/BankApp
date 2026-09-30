@@ -7,10 +7,10 @@
 
 import Foundation
 
-/// Espelha o formato de resposta de GET /obp/v4.0.0/my/accounts da sandbox
-/// OBP, confirmado contra chamada real (não traz saldo — a listagem só
-/// retorna metadados da conta; saldo exige uma chamada por conta separada,
-/// ver comentário em AccountsUseCase.fetchAccounts()).
+/// Mirrors the response format of GET /obp/v4.0.0/my/accounts from the OBP
+/// sandbox, confirmed against a real call (no balance included, the listing
+/// only returns account metadata; balance requires a separate call per
+/// account, see the comment in AccountsUseCase.fetchAccounts()).
 struct AccountsResponseDTO: Decodable {
     let accounts: [AccountDTO]
 }

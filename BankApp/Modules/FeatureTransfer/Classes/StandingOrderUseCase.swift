@@ -21,8 +21,8 @@ public protocol StandingOrderUseCaseProtocol {
     ) async throws
 }
 
-/// Cria um pagamento recorrente (standing order) pra um counterparty já
-/// cadastrado. Ver comentário em CreateStandingOrderRequestDTO.
+/// Creates a recurring payment (standing order) for an already registered
+/// counterparty. See the comment on CreateStandingOrderRequestDTO.
 public final class StandingOrderUseCase: StandingOrderUseCaseProtocol {
     private let apiClient: OBPAPIClient
     private let dateFormatter: ISO8601DateFormatter = {
@@ -35,6 +35,11 @@ public final class StandingOrderUseCase: StandingOrderUseCaseProtocol {
         self.apiClient = apiClient
     }
 
+    /// With no end date, OBP still requires the `date_expires` field to be
+    /// present in the JSON, so we use a date far in the future instead of
+    /// omitting the key.
+    private static let farFutureExpiry = "2099-12-31T00:00:00Z"
+
     public func createStandingOrder(
         for account: Account,
         counterpartyId: String,
@@ -45,13 +50,18 @@ public final class StandingOrderUseCase: StandingOrderUseCaseProtocol {
         startDate: Date,
         endDate: Date?
     ) async throws {
+        let userId = try await apiClient.currentUserId()
+        let customerId = try await apiClient.currentCustomerId(bankId: account.bankId)
+
         let body = CreateStandingOrderRequestDTO(
+            customer_id: customerId,
+            user_id: userId,
             counterparty_id: counterpartyId,
             amount: CreateStandingOrderRequestDTO.Amount(currency: currency, amount: Self.formattedAmount(amount)),
             when: CreateStandingOrderRequestDTO.When(frequency: frequency, detail: dayOfMonth),
             date_signed: dateFormatter.string(from: Date()),
             date_starts: dateFormatter.string(from: startDate),
-            date_expires: endDate.map { dateFormatter.string(from: $0) }
+            date_expires: endDate.map { dateFormatter.string(from: $0) } ?? Self.farFutureExpiry
         )
         let _: StandingOrderResponseDTO = try await apiClient.post(
             path: "/banks/\(account.bankId)/accounts/\(account.id)/owner/standing-order",

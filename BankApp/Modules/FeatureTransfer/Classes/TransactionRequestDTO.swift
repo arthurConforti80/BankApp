@@ -7,10 +7,10 @@
 
 import Foundation
 
-/// Body de POST .../transaction-request-types/SEPA/transaction-requests.
-/// Schema ainda NÃO confirmado contra uma resposta real da sandbox — a
-/// documentação pública da OBP descreve o tipo SEPA como aceitando um IBAN
-/// de destino direto (sem precisar cadastrar um counterparty antes).
+/// Body for POST .../transaction-request-types/SEPA/transaction-requests.
+/// Schema NOT yet confirmed against a real sandbox response. OBP's public
+/// documentation describes the SEPA type as accepting a direct destination
+/// IBAN (without needing to register a counterparty first).
 struct TransactionRequestDTO: Encodable {
     struct Counterparty: Encodable {
         let iban: String
@@ -26,11 +26,11 @@ struct TransactionRequestDTO: Encodable {
     let description: String
 }
 
-/// Resposta da criação/consulta de um transaction request. O nome exato do
-/// campo de desafio (`challenge` vs `challenges`) NÃO está confirmado
-/// contra a sandbox real — a wiki pública da OBP documenta o conceito
-/// (status "INITIATED" + um challenge_id a responder) mas não o schema
-/// exato campo a campo. Ver TransferUseCase para como isso é tratado.
+/// Response from creating/querying a transaction request. The exact name of
+/// the challenge field (`challenge` vs `challenges`) is NOT confirmed
+/// against the real sandbox. OBP's public wiki documents the concept
+/// (status "INITIATED" + a challenge_id to answer) but not the exact
+/// field-by-field schema. See TransferUseCase for how this is handled.
 struct TransactionRequestResponseDTO: Decodable {
     struct ChallengeDTO: Decodable {
         let id: String?
@@ -41,9 +41,9 @@ struct TransactionRequestResponseDTO: Decodable {
     let challenge: ChallengeDTO?
 }
 
-/// Body de POST .../transaction-requests/{id}/challenge, respondendo o
-/// desafio SANDBOX_TAN com o código recebido "fora de banda" (aqui,
-/// simulado na UI).
+/// Body for POST .../transaction-requests/{id}/challenge, answering the
+/// SANDBOX_TAN challenge with the code received "out of band" (here,
+/// simulated in the UI).
 struct ChallengeAnswerDTO: Encodable {
     let id: String
     let answer: String

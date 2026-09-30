@@ -9,9 +9,10 @@ import UIKit
 import Core
 import FeatureLogin
 
-/// Coordinator raiz. Decide qual feature Coordinator inicia o app e faz a
-/// transição entre eles — nenhuma lógica de autenticação ou de dado mora
-/// aqui, só orquestração de navegação entre módulos.
+/// Root coordinator. Decides which feature coordinator starts the app and
+/// handles the transition between them. No authentication or data logic
+/// lives here, just navigation orchestration between modules.
+@MainActor
 public final class AppCoordinator: Coordinator {
     private let navigationController: UINavigationController
     private var childCoordinator: Coordinator?
@@ -21,11 +22,11 @@ public final class AppCoordinator: Coordinator {
         self.navigationController = navigationController
     }
 
-    @MainActor public func start() {
+    public func start() {
         showLogin()
     }
 
-    @MainActor private func showLogin() {
+    private func showLogin() {
         let loginCoordinator = LoginCoordinator(navigationController: navigationController) { [weak self] username in
             self?.showHome(username: username)
         }
@@ -33,7 +34,7 @@ public final class AppCoordinator: Coordinator {
         loginCoordinator.start()
     }
 
-    @MainActor private func showHome(username: String) {
+    private func showHome(username: String) {
         let homeCoordinator = HomeCoordinator(navigationController: navigationController, username: username)
         childCoordinator = homeCoordinator
         homeCoordinator.start()

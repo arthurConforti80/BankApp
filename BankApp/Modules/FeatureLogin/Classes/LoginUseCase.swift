@@ -8,8 +8,9 @@
 import Foundation
 import Core
 
-/// Orquestra a autenticação chamando o client de API compartilhado.
-/// Não conhece SwiftUI, não conhece a ViewModel — só sabe autenticar.
+/// Orchestrates authentication by calling the shared API client.
+/// Knows nothing about SwiftUI, knows nothing about the ViewModel, it only
+/// knows how to authenticate.
 public final class LoginUseCase: LoginUseCaseProtocol {
     private let apiClient: OBPAPIClient
 

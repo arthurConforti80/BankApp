@@ -17,8 +17,8 @@ public protocol DirectDebitUseCaseProtocol {
     ) async throws
 }
 
-/// Autoriza uma empresa (counterparty já cadastrado) a debitar
-/// automaticamente da conta. Ver comentário em CreateDirectDebitRequestDTO.
+/// Authorizes a company (an already registered counterparty) to
+/// automatically debit the account. See the comment on CreateDirectDebitRequestDTO.
 public final class DirectDebitUseCase: DirectDebitUseCaseProtocol {
     private let apiClient: OBPAPIClient
     private let dateFormatter: ISO8601DateFormatter = {
@@ -31,17 +31,24 @@ public final class DirectDebitUseCase: DirectDebitUseCaseProtocol {
         self.apiClient = apiClient
     }
 
+    private static let farFutureExpiry = "2099-12-31T00:00:00Z"
+
     public func createDirectDebit(
         for account: Account,
         counterpartyId: String,
         startDate: Date,
         endDate: Date?
     ) async throws {
+        let userId = try await apiClient.currentUserId()
+        let customerId = try await apiClient.currentCustomerId(bankId: account.bankId)
+
         let body = CreateDirectDebitRequestDTO(
+            customer_id: customerId,
+            user_id: userId,
             counterparty_id: counterpartyId,
             date_signed: dateFormatter.string(from: Date()),
             date_starts: dateFormatter.string(from: startDate),
-            date_expires: endDate.map { dateFormatter.string(from: $0) }
+            date_expires: endDate.map { dateFormatter.string(from: $0) } ?? Self.farFutureExpiry
         )
         let _: DirectDebitResponseDTO = try await apiClient.post(
             path: "/banks/\(account.bankId)/accounts/\(account.id)/owner/direct-debit",

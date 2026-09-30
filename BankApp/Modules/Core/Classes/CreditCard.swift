@@ -7,10 +7,10 @@
 
 import Foundation
 
-/// Entity de domínio. Note que `maskedNumber` já vem mascarado — a Entity
-/// nunca deve carregar o número completo do cartão até a camada de
-/// apresentação; o mascaramento acontece no mapeamento DTO -> Entity
-/// (ver FeatureCards.CardsUseCase), nunca na View.
+/// Domain entity. Note that `maskedNumber` already comes masked. The Entity
+/// should never carry the full card number up to the presentation layer;
+/// the masking happens in the DTO -> Entity mapping (see
+/// FeatureCards.CardsUseCase), never in the View.
 public struct CreditCard: Identifiable, Equatable {
     public let id: String
     public let bankId: String

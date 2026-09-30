@@ -11,9 +11,8 @@ import Core
 
 @MainActor
 public final class DirectDebitFormViewModel: ObservableObject {
-    /// Mesma ressalva do Pagamento recorrente: sem tela de listagem de
-    /// beneficiários ainda, este campo aceita o counterparty_id colado
-    /// manualmente.
+    /// Same caveat as the recurring payment: with no beneficiary listing
+    /// screen yet, this field accepts a manually pasted counterparty_id.
     @Published public var counterpartyId: String = ""
     @Published public var startDate: Date = Date()
     @Published public var hasEndDate: Bool = false
@@ -34,7 +33,7 @@ public final class DirectDebitFormViewModel: ObservableObject {
         errorMessage = nil
 
         guard !counterpartyId.trimmingCharacters(in: .whitespaces).isEmpty else {
-            errorMessage = "Informe o ID da empresa/beneficiário."
+            errorMessage = "Enter the company/beneficiary ID."
             return
         }
 
@@ -52,7 +51,7 @@ public final class DirectDebitFormViewModel: ObservableObject {
                 isSaved = true
             } catch {
                 isSubmitting = false
-                errorMessage = "Não foi possível ativar o débito automático."
+                errorMessage = "Couldn't activate the direct debit."
             }
         }
     }

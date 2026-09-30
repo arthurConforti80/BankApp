@@ -20,18 +20,18 @@ public final class StandingOrderFormViewModel: ObservableObject {
 
         public var label: String {
             switch self {
-            case .weekly: return "Semanal"
-            case .monthly: return "Mensal"
-            case .yearly: return "Anual"
+            case .weekly: return "Weekly"
+            case .monthly: return "Monthly"
+            case .yearly: return "Yearly"
             }
         }
     }
 
-    /// Ainda não existe uma tela de listagem de beneficiários salvos — por
-    /// ora este campo aceita o counterparty_id colado manualmente (ex.: o
-    /// devolvido ao cadastrar um beneficiário). Trocar por um seletor real
-    /// é o próximo passo natural quando a listagem de counterparties for
-    /// implementada.
+    /// There's still no screen listing saved beneficiaries; for now this
+    /// field accepts a manually pasted counterparty_id (e.g. the one
+    /// returned when registering a beneficiary). Swapping this for a real
+    /// picker is the natural next step once the counterparty listing is
+    /// implemented.
     @Published public var counterpartyId: String = ""
     @Published public var amountText: String = ""
     @Published public var frequency: Frequency = .monthly
@@ -55,13 +55,13 @@ public final class StandingOrderFormViewModel: ObservableObject {
         errorMessage = nil
 
         guard !counterpartyId.trimmingCharacters(in: .whitespaces).isEmpty else {
-            errorMessage = "Informe o ID do beneficiário."
+            errorMessage = "Enter the beneficiary ID."
             return
         }
 
         let normalizedAmount = amountText.replacingOccurrences(of: ",", with: ".")
         guard let amount = Decimal(string: normalizedAmount), amount > 0 else {
-            errorMessage = "Informe um valor válido."
+            errorMessage = "Enter a valid amount."
             return
         }
 
@@ -85,7 +85,7 @@ public final class StandingOrderFormViewModel: ObservableObject {
                 isSaved = true
             } catch {
                 isSubmitting = false
-                errorMessage = "Não foi possível agendar o pagamento."
+                errorMessage = "Couldn't schedule the payment."
             }
         }
     }

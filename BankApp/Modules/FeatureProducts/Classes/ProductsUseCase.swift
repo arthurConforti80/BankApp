@@ -12,19 +12,19 @@ public protocol ProductsUseCaseProtocol {
     func fetchProducts() async throws -> [Product]
 }
 
-/// Lista o catálogo de produtos do banco (não é específico da conta do
-/// usuário). Uma sandbox sem produtos cadastrados devolve uma lista vazia —
-/// a Home trata isso como estado vazio normal, nunca como erro.
+/// Lists the bank's product catalog (not specific to the user's account).
+/// A sandbox with no registered products returns an empty list. Home
+/// treats this as a normal empty state, never as an error.
 public final class ProductsUseCase: ProductsUseCaseProtocol {
     private let apiClient: OBPAPIClient
     private let bankId: String
 
-    // Confirmado contra a sandbox real: "inv.01.us.inv" (o banco das
-    // contas do usuário de teste) não tem nenhum produto cadastrado, mas
-    // "inv.01.uk.uk" devolve um catálogo real (hipotecas, cartões,
-    // poupança...). O catálogo de produtos é do banco, não da conta do
-    // usuário, então é normal serem bancos diferentes dentro da mesma
-    // sandbox multi-banco.
+    // Confirmed against the real sandbox: "inv.01.us.inv" (the bank behind
+    // the test user's accounts) has no registered products, but
+    // "inv.01.uk.uk" returns a real catalog (mortgages, cards,
+    // savings...). The product catalog belongs to the bank, not to the
+    // user's account, so it's normal for these to be different banks
+    // within the same multi-bank sandbox.
     public init(apiClient: OBPAPIClient = .shared, bankId: String = "inv.01.uk.uk") {
         self.apiClient = apiClient
         self.bankId = bankId
