@@ -28,7 +28,7 @@ public final class LoginViewModel: ObservableObject {
 
     public func login() {
         guard !username.isEmpty, !password.isEmpty else {
-            errorMessage = "Preencha usuário e senha."
+            errorMessage = "Enter your username and password."
             return
         }
 
@@ -42,7 +42,7 @@ public final class LoginViewModel: ObservableObject {
                 onLoginSucceeded?(username)
             } catch {
                 isLoading = false
-                errorMessage = "Não foi possível autenticar. Verifique as credenciais."
+                errorMessage = "Couldn't sign in. Check your credentials."
             }
         }
     }

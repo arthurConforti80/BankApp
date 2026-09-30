@@ -31,7 +31,7 @@ public struct DetailHeader: View {
                     .background(BankAppTheme.Color.cardFill, in: Circle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Voltar")
+            .accessibilityLabel("Back")
 
             Text(title)
                 .font(BankAppTheme.Typography.body(15, weight: .semibold))

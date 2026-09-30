@@ -34,7 +34,7 @@ public final class AccountsUseCase: AccountsUseCaseProtocol {
             Account(
                 id: dto.id,
                 bankId: dto.bankId,
-                label: dto.label ?? "Conta sem nome",
+                label: dto.label ?? "Unnamed account",
                 accountType: dto.accountType,
                 iban: dto.accountRoutings.first(where: { $0.scheme == "IBAN" })?.address
             )

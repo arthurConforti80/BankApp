@@ -23,7 +23,7 @@ public struct CounterpartyFormView: View {
             BankAppTheme.Color.cream.ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 0) {
-                DetailHeader(title: "Novo beneficiário", onBack: onBack)
+                DetailHeader(title: "New beneficiary", onBack: onBack)
 
                 if viewModel.isSaved {
                     successView
@@ -39,18 +39,18 @@ public struct CounterpartyFormView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Dados do beneficiário")
+                    Text("Beneficiary details")
                         .font(BankAppTheme.Typography.display(20, weight: .semibold))
                         .foregroundStyle(BankAppTheme.Color.ink)
-                    Text("Guarde os dados pra usar em transferências futuras")
+                    Text("Save these details to use in future transfers")
                         .font(BankAppTheme.Typography.body(14))
                         .foregroundStyle(BankAppTheme.Color.mutedText)
                 }
 
-                underlinedField(label: "Nome do beneficiário", placeholder: "Nome completo", text: $viewModel.name)
-                underlinedField(label: "Apelido (opcional)", placeholder: "Ex.: Renda, Sócio, Família", text: $viewModel.nickname)
+                underlinedField(label: "Beneficiary name", placeholder: "Full name", text: $viewModel.name)
+                underlinedField(label: "Nickname (optional)", placeholder: "E.g.: Rent, Partner, Family", text: $viewModel.nickname)
                 underlinedField(label: "IBAN", placeholder: "PT50 0002 0123 1234 5678 9015 4", text: $viewModel.iban)
-                underlinedField(label: "Banco (opcional)", placeholder: "Ex.: Open Bank Project", text: $viewModel.bankName)
+                underlinedField(label: "Bank (optional)", placeholder: "E.g.: Open Bank Project", text: $viewModel.bankName)
 
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
@@ -65,7 +65,7 @@ public struct CounterpartyFormView: View {
                         if viewModel.isSubmitting {
                             ProgressView().tint(BankAppTheme.Color.cream)
                         } else {
-                            Text("Salvar beneficiário")
+                            Text("Save beneficiary")
                                 .font(BankAppTheme.Typography.body(16, weight: .semibold))
                         }
                     }
@@ -109,11 +109,11 @@ public struct CounterpartyFormView: View {
             }
             .frame(width: 64, height: 64)
 
-            Text("Beneficiário salvo")
+            Text("Beneficiary saved")
                 .font(BankAppTheme.Typography.display(20, weight: .semibold))
                 .foregroundStyle(BankAppTheme.Color.ink)
 
-            Text("Já pode usá-lo nas próximas transferências, pagamentos recorrentes ou débitos automáticos.")
+            Text("You can now use it in future transfers, recurring payments or direct debits.")
                 .font(BankAppTheme.Typography.body(14))
                 .foregroundStyle(BankAppTheme.Color.mutedText)
                 .multilineTextAlignment(.center)
@@ -124,7 +124,7 @@ public struct CounterpartyFormView: View {
             }
 
             Button(action: onBack) {
-                Text("Voltar aos pagamentos")
+                Text("Back to payments")
                     .font(BankAppTheme.Typography.body(16, weight: .semibold))
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)
@@ -143,7 +143,7 @@ public struct CounterpartyFormView: View {
     @ViewBuilder
     private func counterpartyIdCard(_ counterpartyId: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("ID do beneficiário (counterparty_id)")
+            Text("Beneficiary ID (counterparty_id)")
                 .font(BankAppTheme.Typography.body(11))
                 .foregroundStyle(BankAppTheme.Color.mutedText)
 

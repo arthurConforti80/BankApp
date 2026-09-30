@@ -27,10 +27,10 @@ struct HomeView: View {
     /// categorização de transações nesta sandbox, então isto é um mock
     /// visual até existir um use case real de categorização de extrato.
     private let spendingCategories: [(name: String, percent: Double, color: SwiftUI.Color)] = [
-        ("Compras", 0.42, BankAppTheme.Color.emerald),
-        ("Alimentação", 0.27, BankAppTheme.Color.emerald),
-        ("Transporte", 0.18, BankAppTheme.Color.gold),
-        ("Outros", 0.13, BankAppTheme.Color.gold)
+        ("Shopping", 0.42, BankAppTheme.Color.emerald),
+        ("Food", 0.27, BankAppTheme.Color.emerald),
+        ("Transport", 0.18, BankAppTheme.Color.gold),
+        ("Other", 0.13, BankAppTheme.Color.gold)
     ]
 
     var body: some View {
@@ -39,7 +39,7 @@ struct HomeView: View {
 
             Group {
                 if viewModel.isLoading {
-                    ProgressView("Carregando...")
+                    ProgressView("Loading...")
                 } else if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .foregroundStyle(BankAppTheme.Color.negative)
@@ -54,9 +54,9 @@ struct HomeView: View {
                                 fxSection
 
                                 sectionList(
-                                    title: "Contas",
+                                    title: "Accounts",
                                     isEmpty: viewModel.accounts.isEmpty,
-                                    emptyText: "Nenhuma conta encontrada."
+                                    emptyText: "No accounts found."
                                 ) {
                                     ForEach(Array(viewModel.accounts.enumerated()), id: \.element.id) { index, account in
                                         if index > 0 {
@@ -72,9 +72,9 @@ struct HomeView: View {
                                 }
 
                                 sectionList(
-                                    title: "Cartões",
+                                    title: "Cards",
                                     isEmpty: viewModel.cards.isEmpty,
-                                    emptyText: "Nenhum cartão encontrado."
+                                    emptyText: "No cards found."
                                 ) {
                                     ForEach(Array(viewModel.cards.enumerated()), id: \.element.id) { index, card in
                                         if index > 0 {
@@ -109,7 +109,7 @@ struct HomeView: View {
     private var header: some View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Olá,")
+                Text("Hi,")
                     .font(BankAppTheme.Typography.body(14))
                     .foregroundStyle(BankAppTheme.Color.mutedText)
                 Text(viewModel.displayName)
@@ -139,7 +139,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Saldo total")
+                    Text("Total balance")
                         .font(BankAppTheme.Typography.body(12))
                         .foregroundStyle(BankAppTheme.Color.mutedOnInk)
                     Text(totalBalanceText)
@@ -150,7 +150,7 @@ struct HomeView: View {
                 Spacer()
 
                 if hasKnownBalance {
-                    Text("+3,2%")
+                    Text("+3.2%")
                         .font(BankAppTheme.Typography.body(11, weight: .semibold))
                         .foregroundStyle(BankAppTheme.Color.ink)
                         .padding(.horizontal, 10)
@@ -168,7 +168,7 @@ struct HomeView: View {
             }
             .frame(height: 40, alignment: .bottom)
 
-            Text("Últimos 7 dias")
+            Text("Last 7 days")
                 .font(BankAppTheme.Typography.body(11))
                 .foregroundStyle(BankAppTheme.Color.mutedOnInk)
         }
@@ -191,7 +191,7 @@ struct HomeView: View {
         }
         guard let firstCurrency = knownAccounts.first?.1,
               knownAccounts.allSatisfy({ $0.1 == firstCurrency }) else {
-            return "Saldo indisponível"
+            return "Balance unavailable"
         }
         let total = knownAccounts.reduce(Decimal(0)) { $0 + $1.0 }
         return BankAppTheme.formattedBalance(total, currency: firstCurrency)
@@ -201,19 +201,19 @@ struct HomeView: View {
 
     private func quickActions(scrollProxy: ScrollViewProxy) -> some View {
         HStack {
-            quickActionButton(systemImage: "arrow.up.right", label: "Transferir") {
+            quickActionButton(systemImage: "arrow.up.right", label: "Transfer") {
                 onSelectPayments()
             }
             Spacer()
-            quickActionIcon(systemImage: "creditcard", label: "Cartões")
+            quickActionIcon(systemImage: "creditcard", label: "Cards")
             Spacer()
-            quickActionButton(systemImage: "square.grid.2x2", label: "Produtos") {
+            quickActionButton(systemImage: "square.grid.2x2", label: "Products") {
                 withAnimation {
                     scrollProxy.scrollTo(Self.productsSectionID, anchor: .top)
                 }
             }
             Spacer()
-            quickActionIcon(systemImage: "list.bullet", label: "Extrato")
+            quickActionIcon(systemImage: "list.bullet", label: "Statement")
         }
     }
 
@@ -250,7 +250,7 @@ struct HomeView: View {
 
     private var paymentsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Pagamentos".uppercased())
+            Text("Payments".uppercased())
                 .font(BankAppTheme.Typography.body(12, weight: .semibold))
                 .tracking(0.5)
                 .foregroundStyle(BankAppTheme.Color.mutedText)
@@ -266,10 +266,10 @@ struct HomeView: View {
                     .frame(width: 40, height: 40)
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Transferência")
+                        Text("Transfer")
                             .font(BankAppTheme.Typography.body(15, weight: .semibold))
                             .foregroundStyle(BankAppTheme.Color.ink)
-                        Text("Nova, beneficiário, recorrente ou débito automático")
+                        Text("New, beneficiary, recurring payment or direct debit")
                             .font(BankAppTheme.Typography.body(12))
                             .foregroundStyle(BankAppTheme.Color.mutedText)
                     }
@@ -297,13 +297,13 @@ struct HomeView: View {
 
     private var fxSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Câmbio".uppercased())
+            Text("Exchange rates".uppercased())
                 .font(BankAppTheme.Typography.body(12, weight: .semibold))
                 .tracking(0.5)
                 .foregroundStyle(BankAppTheme.Color.mutedText)
 
             if viewModel.fxRates.isEmpty {
-                Text("Taxas indisponíveis no momento.")
+                Text("Rates unavailable right now.")
                     .font(BankAppTheme.Typography.body(14))
                     .foregroundStyle(BankAppTheme.Color.mutedText)
             } else {
@@ -346,7 +346,7 @@ struct HomeView: View {
 
     private func formattedRate(_ value: Decimal) -> String {
         let formatter = NumberFormatter()
-        formatter.locale = Locale(identifier: "pt_PT")
+        formatter.locale = Locale(identifier: "en_US")
         formatter.numberStyle = .decimal
         formatter.minimumFractionDigits = 4
         formatter.maximumFractionDigits = 4
@@ -358,7 +358,7 @@ struct HomeView: View {
     private var spendingSummaryCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Gastos do mês".uppercased())
+                Text("Monthly spending".uppercased())
                     .font(BankAppTheme.Typography.body(12, weight: .semibold))
                     .tracking(0.5)
                     .foregroundStyle(BankAppTheme.Color.mutedText)
@@ -404,7 +404,7 @@ struct HomeView: View {
 
     private var currentMonthName: String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "pt_PT")
+        formatter.locale = Locale(identifier: "en_US")
         formatter.dateFormat = "LLLL"
         return formatter.string(from: Date()).capitalized
     }
@@ -485,13 +485,13 @@ struct HomeView: View {
 
     private var productsGrid: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Produtos".uppercased())
+            Text("Products".uppercased())
                 .font(BankAppTheme.Typography.body(12, weight: .semibold))
                 .tracking(0.5)
                 .foregroundStyle(BankAppTheme.Color.mutedText)
 
             if viewModel.products.isEmpty {
-                Text("Não tem produtos relacionados a sua conta")
+                Text("No products linked to your account")
                     .font(BankAppTheme.Typography.body(14))
                     .foregroundStyle(BankAppTheme.Color.mutedText)
             } else {
@@ -567,7 +567,7 @@ struct HomeView: View {
 
     private func balanceText(for account: Account) -> String {
         guard let balance = account.balance, let currency = account.currency else {
-            return "Saldo indisponível"
+            return "Balance unavailable"
         }
         return BankAppTheme.formattedBalance(balance, currency: currency)
     }

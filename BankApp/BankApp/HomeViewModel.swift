@@ -78,7 +78,7 @@ final class HomeViewModel: ObservableObject {
                 isLoading = false
             } catch {
                 isLoading = false
-                errorMessage = "Não foi possível carregar contas e cartões."
+                errorMessage = "Couldn't load accounts and cards."
             }
 
             // Produtos e Câmbio são tratados à parte, best-effort: uma

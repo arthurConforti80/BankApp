@@ -23,7 +23,7 @@ public struct TransactionsSection: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Últimas transações".uppercased())
+            Text("Recent transactions".uppercased())
                 .font(BankAppTheme.Typography.body(12, weight: .semibold))
                 .tracking(0.5)
                 .foregroundStyle(BankAppTheme.Color.mutedText)
@@ -36,7 +36,7 @@ public struct TransactionsSection: View {
                     .font(BankAppTheme.Typography.body(14))
                     .foregroundStyle(BankAppTheme.Color.negative)
             } else if transactions.isEmpty {
-                Text("Nenhuma transação encontrada.")
+                Text("No transactions found.")
                     .font(BankAppTheme.Typography.body(14))
                     .foregroundStyle(BankAppTheme.Color.mutedText)
             } else {

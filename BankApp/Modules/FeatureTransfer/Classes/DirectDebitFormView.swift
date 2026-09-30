@@ -22,7 +22,7 @@ public struct DirectDebitFormView: View {
             BankAppTheme.Color.cream.ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 0) {
-                DetailHeader(title: "Débito automático", onBack: onBack)
+                DetailHeader(title: "Direct debit", onBack: onBack)
 
                 if viewModel.isSaved {
                     successView
@@ -38,18 +38,18 @@ public struct DirectDebitFormView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Autorizar cobrança")
+                    Text("Authorize a charge")
                         .font(BankAppTheme.Typography.display(20, weight: .semibold))
                         .foregroundStyle(BankAppTheme.Color.ink)
-                    Text("A empresa escolhida poderá debitar direto da sua conta")
+                    Text("The chosen company will be able to charge your account directly")
                         .font(BankAppTheme.Typography.body(14))
                         .foregroundStyle(BankAppTheme.Color.mutedText)
                 }
 
-                underlinedField(label: "ID da empresa/beneficiário (counterparty_id)", placeholder: "Colar o ID de um beneficiário salvo", text: $viewModel.counterpartyId)
+                underlinedField(label: "Company/beneficiary ID (counterparty_id)", placeholder: "Paste a saved beneficiary's ID", text: $viewModel.counterpartyId)
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Início")
+                    Text("Start date")
                         .font(BankAppTheme.Typography.body(12))
                         .foregroundStyle(BankAppTheme.Color.mutedText)
                     DatePicker("", selection: $viewModel.startDate, displayedComponents: .date)
@@ -58,18 +58,18 @@ public struct DirectDebitFormView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Toggle("Definir data de término", isOn: $viewModel.hasEndDate)
+                    Toggle("Set end date", isOn: $viewModel.hasEndDate)
                         .font(BankAppTheme.Typography.body(14))
                         .tint(BankAppTheme.Color.emerald)
 
                     if viewModel.hasEndDate {
-                        DatePicker("Data de término", selection: $viewModel.endDate, displayedComponents: .date)
+                        DatePicker("End date", selection: $viewModel.endDate, displayedComponents: .date)
                             .font(BankAppTheme.Typography.body(14))
                             .tint(BankAppTheme.Color.ink)
                     }
                 }
 
-                Text("O valor de cada cobrança é definido pela empresa a cada fatura — você continua vendo cada débito no seu extrato e pode cancelar a qualquer momento.")
+                Text("The amount of each charge is set by the company per invoice. You'll still see every debit on your statement and can cancel at any time.")
                     .font(BankAppTheme.Typography.body(12))
                     .foregroundStyle(BankAppTheme.Color.mutedText)
                     .padding(14)
@@ -90,7 +90,7 @@ public struct DirectDebitFormView: View {
                         if viewModel.isSubmitting {
                             ProgressView().tint(BankAppTheme.Color.cream)
                         } else {
-                            Text("Ativar débito automático")
+                            Text("Activate direct debit")
                                 .font(BankAppTheme.Typography.body(16, weight: .semibold))
                         }
                     }
@@ -133,18 +133,18 @@ public struct DirectDebitFormView: View {
             }
             .frame(width: 64, height: 64)
 
-            Text("Débito automático ativo")
+            Text("Direct debit active")
                 .font(BankAppTheme.Typography.display(20, weight: .semibold))
                 .foregroundStyle(BankAppTheme.Color.ink)
 
-            Text("A autorização foi registrada. Cada cobrança futura vai aparecer no seu extrato normalmente.")
+            Text("The authorization has been registered. Every future charge will show up on your statement as usual.")
                 .font(BankAppTheme.Typography.body(14))
                 .foregroundStyle(BankAppTheme.Color.mutedText)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 280)
 
             Button(action: onBack) {
-                Text("Voltar aos pagamentos")
+                Text("Back to payments")
                     .font(BankAppTheme.Typography.body(16, weight: .semibold))
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)

@@ -20,9 +20,9 @@ public final class StandingOrderFormViewModel: ObservableObject {
 
         public var label: String {
             switch self {
-            case .weekly: return "Semanal"
-            case .monthly: return "Mensal"
-            case .yearly: return "Anual"
+            case .weekly: return "Weekly"
+            case .monthly: return "Monthly"
+            case .yearly: return "Yearly"
             }
         }
     }
@@ -55,13 +55,13 @@ public final class StandingOrderFormViewModel: ObservableObject {
         errorMessage = nil
 
         guard !counterpartyId.trimmingCharacters(in: .whitespaces).isEmpty else {
-            errorMessage = "Informe o ID do beneficiário."
+            errorMessage = "Enter the beneficiary ID."
             return
         }
 
         let normalizedAmount = amountText.replacingOccurrences(of: ",", with: ".")
         guard let amount = Decimal(string: normalizedAmount), amount > 0 else {
-            errorMessage = "Informe um valor válido."
+            errorMessage = "Enter a valid amount."
             return
         }
 
@@ -85,7 +85,7 @@ public final class StandingOrderFormViewModel: ObservableObject {
                 isSaved = true
             } catch {
                 isSubmitting = false
-                errorMessage = "Não foi possível agendar o pagamento."
+                errorMessage = "Couldn't schedule the payment."
             }
         }
     }

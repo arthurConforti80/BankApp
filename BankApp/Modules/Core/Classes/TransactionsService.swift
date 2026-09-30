@@ -34,7 +34,7 @@ public final class TransactionsService: TransactionsServiceProtocol {
         return response.transactions.prefix(limit).map { dto in
             Transaction(
                 id: dto.id,
-                description: dto.details?.description ?? "Transação",
+                description: dto.details?.description ?? "Transaction",
                 amount: Decimal(string: dto.details?.value?.amount ?? "") ?? 0,
                 currency: dto.details?.value?.currency ?? "",
                 completedDate: dto.details?.completed

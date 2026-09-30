@@ -67,17 +67,17 @@ public struct LoginView: View {
     private var formSheet: some View {
         VStack(alignment: .leading, spacing: 24) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Entrar")
+                Text("Sign in")
                     .font(BankAppTheme.Typography.display(22, weight: .semibold))
                     .foregroundStyle(BankAppTheme.Color.ink)
-                Text("Acesse sua conta para continuar")
+                Text("Access your account to continue")
                     .font(BankAppTheme.Typography.body(14))
                     .foregroundStyle(BankAppTheme.Color.mutedText)
             }
 
             VStack(alignment: .leading, spacing: 18) {
                 underlinedField(
-                    label: "Usuário",
+                    label: "Username",
                     placeholder: "Robert.Us.01",
                     text: $viewModel.username,
                     field: .username,
@@ -85,7 +85,7 @@ public struct LoginView: View {
                 )
 
                 underlinedField(
-                    label: "Senha",
+                    label: "Password",
                     placeholder: "••••••••••",
                     text: $viewModel.password,
                     field: .password,
@@ -108,7 +108,7 @@ public struct LoginView: View {
                         ProgressView()
                             .tint(BankAppTheme.Color.cream)
                     } else {
-                        Text("Entrar")
+                        Text("Sign in")
                             .font(BankAppTheme.Typography.body(16, weight: .semibold))
                     }
                 }
@@ -121,7 +121,7 @@ public struct LoginView: View {
 
             Spacer(minLength: 12)
 
-            Text("Ambiente de testes — nenhum dado real é utilizado")
+            Text("Test environment, no real data is used")
                 .font(BankAppTheme.Typography.body(12))
                 .foregroundStyle(BankAppTheme.Color.mutedText)
                 .frame(maxWidth: .infinity, alignment: .center)

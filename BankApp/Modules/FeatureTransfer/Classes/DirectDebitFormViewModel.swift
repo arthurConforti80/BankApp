@@ -34,7 +34,7 @@ public final class DirectDebitFormViewModel: ObservableObject {
         errorMessage = nil
 
         guard !counterpartyId.trimmingCharacters(in: .whitespaces).isEmpty else {
-            errorMessage = "Informe o ID da empresa/beneficiário."
+            errorMessage = "Enter the company/beneficiary ID."
             return
         }
 
@@ -52,7 +52,7 @@ public final class DirectDebitFormViewModel: ObservableObject {
                 isSaved = true
             } catch {
                 isSubmitting = false
-                errorMessage = "Não foi possível ativar o débito automático."
+                errorMessage = "Couldn't activate the direct debit."
             }
         }
     }

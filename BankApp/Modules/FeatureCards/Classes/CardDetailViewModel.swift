@@ -33,7 +33,7 @@ public final class CardDetailViewModel: ObservableObject {
                 isLoading = false
             } catch {
                 isLoading = false
-                errorMessage = "Não foi possível carregar o extrato."
+                errorMessage = "Couldn't load the statement."
             }
         }
     }

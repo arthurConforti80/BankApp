@@ -38,9 +38,9 @@ public struct TransferHubView: View {
             BankAppTheme.Color.cream.ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 0) {
-                DetailHeader(title: "Pagamentos", onBack: onBack)
+                DetailHeader(title: "Payments", onBack: onBack)
 
-                Text("O que você quer fazer?")
+                Text("What would you like to do?")
                     .font(BankAppTheme.Typography.display(22, weight: .semibold))
                     .foregroundStyle(BankAppTheme.Color.ink)
                     .padding(.horizontal, 28)
@@ -51,26 +51,26 @@ public struct TransferHubView: View {
                     VStack(spacing: 12) {
                         hubRow(
                             icon: "arrow.up.right",
-                            title: "Nova transferência",
-                            subtitle: "Para um IBAN, com confirmação por código",
+                            title: "New transfer",
+                            subtitle: "To an IBAN, with code confirmation",
                             action: onNewTransfer
                         )
                         hubRow(
                             icon: "person.2",
-                            title: "Novo beneficiário",
-                            subtitle: "Guarde um contato pra transferir mais rápido",
+                            title: "New beneficiary",
+                            subtitle: "Save a contact to transfer faster",
                             action: onNewCounterparty
                         )
                         hubRow(
                             icon: "calendar",
-                            title: "Pagamento recorrente",
-                            subtitle: "Agende um valor fixo, todo mês",
+                            title: "Recurring payment",
+                            subtitle: "Schedule a fixed amount, every month",
                             action: onStandingOrder
                         )
                         hubRow(
                             icon: "arrow.triangle.2.circlepath",
-                            title: "Débito automático",
-                            subtitle: "Autorize uma empresa a cobrar direto na conta",
+                            title: "Direct debit",
+                            subtitle: "Authorize a company to charge your account directly",
                             action: onDirectDebit
                         )
                     }
