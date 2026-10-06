@@ -27,7 +27,7 @@ jobs:
       - name: Instalar swift-arch-audit-mcp
         env:
           MCP_REPO_TOKEN: ${{ secrets.MCP_REPO_TOKEN }}
-        run: pip install "git+https://x-access-token:${MCP_REPO_TOKEN}@github.com/arthurConforti80/MCP.git@develop#subdirectory=swift-arch-audit-mcp"
+        run: pip install "git+https://x-access-token:${MCP_REPO_TOKEN}@github.com/arthurConforti80/MCP.git@master#subdirectory=swift-arch-audit-mcp"
 
       - name: Rodar auditoria de arquitetura
         id: audit
